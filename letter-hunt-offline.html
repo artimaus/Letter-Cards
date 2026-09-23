@@ -13,7 +13,7 @@
 :root{
   --board:#C9EEDF; --board-dot:#B2E2CF; --ink:#1D2B4F; --muted:#56637F;
   --card:#FFFFFF; --edge:#D5DDEB; --back:#2E78D0; --back-dot:#4A8FE0;
-  --red:#E5483F; --yellow:#E9A20F; --green:#1F9A5E; --blue:#2E78D0; --purple:#8657D3; --orange:#EA6C1F;
+  --red:#E5483F; --yellow:#E9A20F; --green:#1F9A5E; --blue:#2E78D0; --purple:#8657D3; --orange:#EA6C1F; --teal:#168C99; --pink:#D13F7A;
   --panel:#FFFFFF; --panel-2:#F2F6FB; --line:#DCE3EE; --ok:#1F9A5E;
   --letter:"Andika","Andika New Basic","Trebuchet MS",system-ui,sans-serif;
   --ui:"Fredoka","Andika",ui-rounded,"Trebuchet MS",system-ui,sans-serif;
@@ -142,17 +142,23 @@ button:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
 .card.wiggle{animation:wiggle .45s}
 .card.win{animation:pop .55s;z-index:2}
 .card.dim{opacity:.28}
+.card.out{opacity:.12;pointer-events:none}
+.card.hint{animation:nudge 1.1s ease-in-out infinite;z-index:1}
+.card.hint .face{outline:5px solid var(--yellow);outline-offset:3px}
+@keyframes nudge{50%{transform:scale(1.08)}}
+.banner{flex:none;align-self:center;display:flex;align-items:center;gap:12px;margin-top:12px;padding:10px 26px 10px 18px;border-radius:999px;
+  background:var(--c,var(--blue));color:#fff;font:600 clamp(18px,2.6vw,24px)/1.1 var(--ui);text-shadow:0 1px 0 rgba(0,0,0,.18);
+  box-shadow:0 5px 0 color-mix(in srgb,var(--c,var(--blue)) 70%,#000)}
+.banner:empty{display:none}
+.banner svg{width:1.35em;height:1.35em;flex:none}
 @keyframes wiggle{20%{transform:rotate(-7deg)}40%{transform:rotate(6deg)}60%{transform:rotate(-4deg)}80%{transform:rotate(2deg)}}
 @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.22)}70%{transform:scale(.96)}100%{transform:scale(1)}}
 
 /* ---------- celebrate ---------- */
-#party{background:color-mix(in srgb,var(--board) 88%,transparent);align-items:center;justify-content:center;gap:34px;z-index:20}
+#party{background:color-mix(in srgb,var(--board) 88%,transparent);padding:10px 14px 14px;z-index:20}
+.party-mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;padding-bottom:72px}
+.party-mid .bigplay{width:clamp(110px,22vw,150px)}
 .trophy{font-size:clamp(90px,22vw,170px);line-height:1;animation:pop .7s}
-.party-btns{display:flex;gap:26px}
-.party-btns .bigplay{width:clamp(96px,20vw,130px)}
-.party-btns .home{background:var(--blue);box-shadow:0 10px 0 #1F5AA0}
-.party-btns .home:active{box-shadow:0 2px 0 #1F5AA0}
-.party-btns .home svg{margin:0}
 .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:30}
 .confetti i{position:absolute;top:-20px;width:12px;height:16px;border-radius:3px;animation:fall linear forwards}
 @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
@@ -208,7 +214,7 @@ button:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
 .filter{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--muted)}
 @media (prefers-reduced-motion: reduce){
   .card .inner{transition-duration:.01s}
-  .card.win,.card.wiggle,.star.lit,.trophy,.pic.bounce,.slot.next{animation:none}
+  .card.win,.card.wiggle,.card.hint,.star.lit,.trophy,.pic.bounce,.slot.next{animation:none}
 }
 /* ---------- v2: profiles, levels ---------- */
 .profiles{flex:1;display:flex;flex-wrap:wrap;gap:clamp(18px,4vw,36px);align-content:center;justify-content:center;padding:8px 0 24px}
@@ -296,16 +302,19 @@ button:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
   </div>
   <div class="target" id="target"></div>
   <div class="grid" id="grid"></div>
+  <div class="banner" id="banner" aria-live="polite"></div>
 </section>
 
 <section id="party" class="screen">
-  <div id="partyArt"></div>
-  <div class="party-btns">
+  <div class="bar">
+    <button class="round-btn" id="partyHome" aria-label="Back home">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.2 2.6 11a1 1 0 0 0 1.3 1.5l.6-.5V20a1 1 0 0 0 1 1h4.5v-6h4v6h4.5a1 1 0 0 0 1-1v-8l.6.5A1 1 0 0 0 21.4 11z"/></svg>
+    </button>
+  </div>
+  <div class="party-mid">
+    <div id="partyArt"></div>
     <button class="bigplay" id="againBtn" aria-label="Keep playing">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>
-    </button>
-    <button class="bigplay home" id="partyHome" aria-label="Back home">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.2 2.6 11a1 1 0 0 0 1.3 1.5l.6-.5V20a1 1 0 0 0 1 1h4.5v-6h4v6h4.5a1 1 0 0 0 1-1v-8l.6.5A1 1 0 0 0 21.4 11z"/></svg>
     </button>
   </div>
 </section>
@@ -345,9 +354,7 @@ const WORDS = [["cat","🐱"],["dog","🐶"],["sun","☀️"],["pig","🐷"],["b
 const CONFUSE = [["b","d","p","q"],["m","w"],["n","u","h"],["i","l","j"],["c","o"],["e","f"],["v","y"],["s","z"],["sh","ch","th"]];
 const PALETTE = ["--red","--blue","--green","--purple","--orange","--yellow"];
 
-/* ================= progression =================
-   Each activity is available from level `min` through level `max`.
-   Past `max` it disappears for good: that's how easy games and small card counts drop out. */
+/* ================= progression ================= */
 const MAX_LEVEL = 10;
 /* Each game "line" has one version per level, on a growing grid (2×2, 3×3, 4×4).
    Find the letter and find the sound retire after three levels. The memory lines are replaced
@@ -407,13 +414,19 @@ function actLabel(a){
   }
 }
 const UP_WINDOW = 10, UP_SCORE = .85, DOWN_WINDOW = 6, DOWN_SCORE = .5;
-const SET_SIZE = 5;
+const setSize = () => Math.max(3, Math.min(5, state.setSize || 4));   // rounds per set
+const REPEAT_MS = 12000, REPEAT_MAX = 3;   // sound questions repeat after this long with no tap
+const RAPID_MS = 700;                      // a wrong tap this soon after the cards unlock counts as a guess
+const GUESS_WINDOW = 5, GUESS_ROUNDS = 3;  // this many guessy rounds out of the last few drops a level
 
 /* ================= state & profiles ================= */
 const SKEY = "letterhunt.v2", OLDKEY = "letterhunt.settings.v1";
-const slug = n => (n || "").toLowerCase().replace(/[^a-z]/g, "");
+const plain = n => (n || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");   // "Zoë" -> "Zoe"
+const nameLetters = n => plain(n).replace(/[^a-z]/gi, "");
+const slug = n => nameLetters(n).toLowerCase();
+const oldSlug = n => (n || "").toLowerCase().replace(/[^a-z]/g, "");               // before accents were kept
 function newProfile(name = ""){
-  return {id:"p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name, level:1, style:"upper", known:[], stats:{}, recent:[], rounds:0};
+  return {id:"p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name, level:1, style:"upper", known:[], stats:{}, recent:[], guessy:[], rounds:0};
 }
 function fixStats(st){ const o = {}; for (const [k, v] of Object.entries(st || {})) o[k] = Array.isArray(v) ? {n:v[0], f:v[1], r:[]} : v; return o; }
 let state = null;
@@ -424,7 +437,9 @@ if (!state) {
   if (old) { p.style = old.style || "upper"; p.known = old.known || []; p.stats = fixStats(old.stats); }
   state = {profiles:[p], music:old ? !!old.music : false, autoTrim:old ? old.autoTrim !== false : true, editId:p.id};
 }
-state.profiles.forEach(p => { p.stats = fixStats(p.stats); p.recent = p.recent || []; p.known = p.known || []; p.slug = slug(p.name); });
+state.profiles.forEach(p => { p.stats = fixStats(p.stats); p.recent = p.recent || []; p.guessy = p.guessy || []; p.known = p.known || []; p.slug = slug(p.name); });
+if (state.setSize == null) state.setSize = 4;
+if (state.fullscreen == null) state.fullscreen = true;
 const save = () => { try { localStorage.setItem(SKEY, JSON.stringify(state)); } catch(e) {} };
 const profById = id => state.profiles.find(p => p.id === id);
 
@@ -439,8 +454,14 @@ const PHRASES = [
   ["praise_1","“Yes!”","","Yes!"],
   ["praise_2","“You found it!”","","You found it!"],
   ["praise_3","“Great job!”","","Great job!"],
-  ["you_did_it","“You did it!”","After every five rounds.","You did it!"],
-  ["level_up","“You’re getting so good!”","Plays when they move up a level. Any cheer works.","You're getting so good!"]
+  ["praise_4","“That’s it!”","","That's it!"],
+  ["praise_5","“You got it!”","","You got it!"],
+  ["praise_6","“Great looking!”","","Great looking!"],
+  ["praise_7","“Nice finding!”","","Nice finding!"],
+  ["praise_8","“Right!”","","Right!"],
+  ["kept_trying","“You kept trying!”","Now and then, after they find it with some help.","You kept trying!"],
+  ["you_did_it","“You did it!”","At the end of every set.","You did it!"],
+  ["level_up","“New games to play!”","Plays when they move up a level. Any cheer works.","New games to play!"]
 ];
 let CLIPS = {};
 function buildClips(){
@@ -519,7 +540,7 @@ function tts(text, gen){
 }
 let speakGen = 0, curSrc = null;
 function stopSpeech(){
-  speakGen++;
+  speakGen++; clearRepeat();
   if (curSrc) { try { curSrc.stop(); } catch(e) {} curSrc = null; }
   if ("speechSynthesis" in window) speechSynthesis.cancel();
   $("#speakBtn").classList.remove("talking");
@@ -597,18 +618,31 @@ function startMusic(){
 function stopMusic(){ if (musicTimer) { clearInterval(musicTimer); musicTimer = null; } if (ac) musicOut.gain.setTargetAtTime(0, ac.currentTime, .1); }
 document.addEventListener("visibilitychange", () => { if (document.hidden) { stopMusic(); stopSpeech(); } else if (!$("#start").classList.contains("on") && !$("#parent").classList.contains("on")) startMusic(); });
 
+/* ================= full screen ================= */
+const fsEl = document.documentElement;
+const fsAvailable = !!((document.fullscreenEnabled || document.webkitFullscreenEnabled) && (fsEl.requestFullscreen || fsEl.webkitRequestFullscreen));
+const isFull = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+function enterFS(){
+  if (!fsAvailable || !state.fullscreen || isFull()) return;
+  try { const r = (fsEl.requestFullscreen || fsEl.webkitRequestFullscreen).call(fsEl); if (r && r.catch) r.catch(() => {}); } catch(e) {}
+}
+function exitFS(){
+  if (!isFull()) return;
+  try { const r = (document.exitFullscreen || document.webkitExitFullscreen).call(document); if (r && r.catch) r.catch(() => {}); } catch(e) {}
+}
+
 /* ================= screens / home ================= */
 function show(id){ document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === id)); }
 let P = state.profiles[0];                       // profile being played
 const disp = (u, upper) => (upper || P.style === "upper") ? u.toUpperCase() : u;
 const PLAY_SVG = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>`;
 function nameTiles(p){
-  return p.name.replace(/[^a-z]/gi, "").split("").map((l, i) =>
+  return nameLetters(p.name).split("").map((l, i) =>
     `<span style="--c:var(${PALETTE[i % PALETTE.length]})">${i ? (p.style === "upper" ? l.toUpperCase() : l.toLowerCase()) : l.toUpperCase()}</span>`).join("");
 }
 function renderHome(){
   $("#profiles").innerHTML = state.profiles.map((p, i) => {
-    const initial = p.slug ? p.name.trim()[0].toUpperCase() : "★";
+    const initial = p.slug ? nameLetters(p.name)[0].toUpperCase() : "★";
     return `<div class="pwrap"><button class="prof" data-id="${p.id}" aria-label="Play${p.name ? " as " + esc(p.name) : ""}">
       <span class="avatar" style="--c:var(${PALETTE[i % PALETTE.length]})">${initial}<span class="go">${PLAY_SVG}</span></span>
       <span class="pname">${esc(p.name || "Play")}</span>
@@ -617,12 +651,12 @@ function renderHome(){
 }
 $("#profiles").addEventListener("click", e => {
   const nb = e.target.closest(".namebtn");
-  if (nb) { ensureAudio(); SFX.tap(); startSession(profById(nb.dataset.name), "NAME"); return; }
+  if (nb) { ensureAudio(); enterFS(); SFX.tap(); startSession(profById(nb.dataset.name), "NAME"); return; }
   const b = e.target.closest(".prof"); if (!b) return;
-  ensureAudio(); SFX.tap(); startSession(profById(b.dataset.id));
+  ensureAudio(); enterFS(); SFX.tap(); startSession(profById(b.dataset.id));
 });
 $("#startBtn").addEventListener("click", () => {
-  ensureAudio();
+  ensureAudio(); enterFS();
   if ("speechSynthesis" in window) { const u = new SpeechSynthesisUtterance(" "); u.volume = 0; speechSynthesis.speak(u); }
   SFX.star(); renderHome(); show("home"); startMusic();
 });
@@ -638,11 +672,11 @@ $("#startBtn").addEventListener("click", () => {
 })();
 
 /* ================= game engine ================= */
-const G = {session:0, act:null, practice:null, done:0, busy:true, target:null, by:"name", stepFirst:true,
-  steps:0, firstSteps:0, prompt:[], recent:[], recentWords:[], lastLine:null, seq:null, idx:0, word:null, unlockRound:false};
+const G = {session:0, act:null, practice:null, tryLevel:null, done:0, busy:true, hearing:false, target:null, by:"name", stepFirst:true,
+  steps:0, firstSteps:0, prompt:[], recent:[], recentWords:[], lastLine:null, seq:null, idx:0, word:null, unlockRound:false,
+  step:0, misses:0, rapid:0, readyAt:0, repeatTimer:null, repeats:0, seenS:{}};
 const confGroup = u => CONFUSE.find(g => g.includes(u)) || [u];
 const knows = u => P.known.includes(u);
-const nameOk = () => !!P.slug;
 
 function levelActs(level){ return ACTS.filter(a => a.min <= level && level <= a.max); }
 const nameUnlocked = p => !!p.slug && !!p.nameUnlocked;
@@ -674,18 +708,51 @@ function distractors(avoid, n, pool){
   for (const u of shuffle(pool)) { if (out.length >= n) break; if (!out.includes(u) && !avoid.includes(u)) out.push(u); }
   return out;
 }
+/* Sounds asked about: the known ones plus the next few on the list (at least 8 in all).
+   Targets rotate evenly: the least-asked sound this session comes up next. */
 function soundPools(n){
   const known = TEACH_ORDER.filter(knows);
-  const learning = TEACH_ORDER.filter(u => !knows(u)).slice(0, 2);
-  const pool = known.length + learning.length >= n + 2 ? known.concat(learning) : TEACH_ORDER.slice(0, Math.max(n + 8, known.length + 6));
-  return {known, learning, pool};
+  const active = known.concat(TEACH_ORDER.filter(u => !knows(u)).slice(0, Math.max(2, 8 - known.length)));
+  const pool = active.length >= n + 2 ? active : TEACH_ORDER.slice(0, Math.max(n + 8, active.length));
+  return {active, pool};
+}
+const leastAsked = units => shuffle(units).sort((a, b) => (G.seenS[a] || 0) - (G.seenS[b] || 0));
+const markAsked = u => { G.seenS[u] = (G.seenS[u] || 0) + 1; };
+function pickSound(active){
+  const fresh = active.filter(u => !G.recent.includes(u));
+  const t = leastAsked(fresh.length ? fresh : active)[0];
+  markAsked(t);
+  G.recent.push(t); while (G.recent.length > Math.min(4, active.length - 1)) G.recent.shift();
+  return t;
 }
 const voiceFor = (u, by) => by === "sound" ? "snd_" + u : "name_" + u;
 const askFor = (u, by) => by === "sound" ? ["which_says", "snd_" + u] : ["find", "name_" + u];
 
 function renderStars(){
-  $("#stars").innerHTML = Array.from({length:SET_SIZE}, (_, i) =>
+  $("#stars").innerHTML = Array.from({length:setSize()}, (_, i) =>
     `<svg class="star${i < G.done ? " lit" : ""}" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17l-6.1 3.4 1.5-6.8L2.2 9l6.9-.7z"/></svg>`).join("");
+}
+const BANNER_ICON = {
+  find:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/></svg>`,
+  sound:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L12 19V5L7.5 9.5z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg>`,
+  mem:`<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="4" width="8" height="10" rx="2"/><rect x="13" y="10" width="8" height="10" rx="2" opacity=".6"/></svg>`,
+  clear:`<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2" opacity=".35"/><rect x="3" y="13" width="8" height="8" rx="2" opacity=".35"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>`,
+  word:`<svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="7" width="6" height="10" rx="1.5"/><rect x="9" y="7" width="6" height="10" rx="1.5" opacity=".8"/><rect x="16" y="7" width="6" height="10" rx="1.5" opacity=".6"/></svg>`,
+  name:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17l-6.1 3.4 1.5-6.8L2.2 9l6.9-.7z"/></svg>`
+};
+function bannerFor(a){
+  const s = a.by === "sound";
+  switch (a.game) {
+    case "find":   return s ? ["Find the sound", "--yellow", "sound"] : ["Find the letter", "--red", "find"];
+    case "memory": return s ? ["Memory: sounds", "--purple", "mem"] : ["Memory: letters", "--blue", "mem"];
+    case "clear":  return s ? ["Clear the board: sounds", "--pink", "clear"] : ["Clear the board: letters", "--teal", "clear"];
+    case "words":  return ["Spell a word", "--green", "word"];
+    default:       return ["Spell my name", "--orange", "name"];
+  }
+}
+function setBanner(a){
+  const [label, c, icon] = bannerFor(a), b = $("#banner");
+  b.style.setProperty("--c", `var(${c})`); b.innerHTML = `${BANNER_ICON[icon]}<span>${label}</span>`;
 }
 function layoutCards(){
   const grid = $("#grid"), n = grid.querySelectorAll(".card").length; if (!n) return;
@@ -721,51 +788,72 @@ function renderSlots(seq, {pic = null, hint = true, firstUpper = false} = {}){
   layoutSlots();
 }
 function markNextSlot(){ document.querySelectorAll(".slot").forEach((s, i) => s.classList.toggle("next", i === G.idx)); }
-function setPrompt(p){ G.prompt = p; return say(p); }
-$("#speakBtn").addEventListener("click", () => { ensureAudio(); if (G.prompt.length && !G.busy) say(G.prompt); });
+/* Say the question; cards can't be tapped until it finishes. `spoken` lets memory games
+   say just the target after the flip while the speaker button keeps the full question. */
+async function ask(prompt, spoken = prompt){
+  G.prompt = prompt; G.hearing = true;
+  const step = G.step, sess = G.session;
+  await say(spoken);
+  if (G.step !== step || G.session !== sess) return;
+  G.hearing = false; G.readyAt = performance.now(); armRepeat();
+}
+function clearRepeat(){ clearTimeout(G.repeatTimer); G.repeatTimer = null; }
+function armRepeat(){
+  clearRepeat();
+  if (G.by !== "sound" || !G.prompt.length || G.repeats >= REPEAT_MAX) return;
+  const step = G.step, sess = G.session;
+  G.repeatTimer = setTimeout(() => {
+    if (G.step !== step || G.session !== sess || G.busy || G.hearing || document.hidden) return;
+    G.repeats++; ask(G.prompt);
+  }, REPEAT_MS);
+}
+function newStep(){ G.step++; G.misses = 0; G.repeats = 0; G.stepFirst = true; clearRepeat();
+  document.querySelectorAll("#grid .card.hint").forEach(c => c.classList.remove("hint")); }
+$("#speakBtn").addEventListener("click", () => { ensureAudio(); if (G.prompt.length && !G.busy && !G.hearing) { G.repeats = 0; ask(G.prompt); } });
 
-function startSession(profile, practiceId = null){
+function startSession(profile, practiceId = null, tryLevel = null){
   stopSpeech(); G.session++;
-  P = profile; G.practice = practiceId; G.tryLevel = null; G.done = 0; G.recent = []; G.lastLine = null; G.unlockRound = false;
-  $("#target").innerHTML = ""; $("#grid").innerHTML = "";
+  P = profile; G.practice = practiceId; G.tryLevel = tryLevel; G.done = 0; G.recent = []; G.seenS = {}; G.lastLine = null; G.unlockRound = false;
+  $("#target").innerHTML = ""; $("#grid").innerHTML = ""; $("#banner").innerHTML = "";
   show("play"); renderStars(); startMusic();
   const sess = G.session; setTimeout(() => { if (G.session === sess) nextRound(); }, 250);
 }
 
-const lookTime = n => 1600 + n * 380;   // how long the cards stay face-up before flipping
+const lookTime = n => Math.round((1600 + n * 380) * 1.2);   // how long the cards stay face-up after the question
+function flipAll(){ SFX.flip(); document.querySelectorAll("#grid .card").forEach(c => { c.classList.add("down"); c.setAttribute("aria-label", "hidden card"); }); }
 async function nextRound(){
   G.unlockRound = false;
   const act = chooseAct(); G.act = act; G.lastLine = act.line;
-  G.steps = 0; G.firstSteps = 0; G.stepFirst = true; G.seq = null; G.idx = 0; G.busy = false;
-  $("#target").innerHTML = "";
+  G.steps = 0; G.firstSteps = 0; G.rapid = 0; G.seq = null; G.idx = 0; G.busy = false; G.hearing = false; newStep();
+  $("#target").innerHTML = ""; setBanner(act);
   const sess = G.session, alive = () => G.session === sess;
   const n = act.cards;
 
   if (act.game === "find" && act.by === "name") {
     G.by = "name"; G.target = pickFresh(LETTERS);
     renderCards(shuffle([G.target, ...distractors([G.target], n - 1, LETTERS)]));
-    setPrompt(askFor(G.target, "name"));
+    ask(askFor(G.target, "name"));
   }
   else if (act.game === "find") {
     G.by = "sound";
-    const {known, learning, pool} = soundPools(n);
-    G.target = pickFresh(known.length ? [...known, ...known, ...known, ...learning] : learning);
+    const {active, pool} = soundPools(n);
+    G.target = pickSound(active);
     renderCards(shuffle([G.target, ...distractors([G.target], n - 1, pool)]));
-    setPrompt(askFor(G.target, "sound"));
+    ask(askFor(G.target, "sound"));
   }
   else if (act.game === "memory") {
     G.by = act.by; G.busy = true;
     let pool = LETTERS;
-    if (act.by === "sound") { const sp = soundPools(n); pool = sp.pool; G.target = pickFresh(sp.known.length ? sp.known : sp.learning); }
+    if (act.by === "sound") { const sp = soundPools(n); pool = sp.pool; G.target = pickSound(sp.active); }
     else G.target = pickFresh(LETTERS);
     renderCards(shuffle([G.target, ...distractors([G.target], n - 1, pool)]));
+    // "Look closely!" … "Find the B" … (look) … flip, then just "B"
     G.prompt = askFor(G.target, act.by);
-    await say(["look"]); await wait(lookTime(n));
-    if (!alive()) return;
-    SFX.flip();
-    document.querySelectorAll("#grid .card").forEach(c => { c.classList.add("down"); c.setAttribute("aria-label", "hidden card"); });
+    await say(["look", 700, ...G.prompt]); if (!alive()) return;
+    await wait(lookTime(n)); if (!alive()) return;
+    flipAll();
     await wait(600); if (!alive()) return;
-    G.busy = false; say(G.prompt);
+    G.busy = false; ask(G.prompt, [voiceFor(G.target, act.by)]);
   }
   else if (act.game === "clear") {
     // several finds from one set of cards; each found card disappears
@@ -773,12 +861,11 @@ async function nextRound(){
     let targets = [], pool = LETTERS;
     if (act.by === "sound") {
       const sp = soundPools(n); pool = sp.pool;
-      const favored = shuffle(sp.known.length ? sp.known : sp.learning);
-      const extra = shuffle(sp.learning.filter(u => !favored.includes(u))).slice(0, 1);
-      for (const u of [...extra, ...favored, ...shuffle(pool)]) {
+      for (const u of [...leastAsked(sp.active), ...shuffle(pool)]) {
         if (targets.length >= act.finds) break;
         if (!targets.some(t => confGroup(t).includes(u))) targets.push(u);
       }
+      targets.forEach(markAsked);
     } else {
       for (const u of shuffle(LETTERS.filter(l => !G.recent.includes(l)))) {
         if (targets.length >= act.finds) break;
@@ -791,18 +878,18 @@ async function nextRound(){
     $("#target").innerHTML = `<div class="pips">${targets.map((_, i) => `<span class="pip${i === 0 ? " next" : ""}"></span>`).join("")}</div>`;
     renderCards(shuffle([...targets, ...distractors(targets, n - targets.length, pool)]));
     if (act.down) {
-      G.busy = true;
-      await say(["look"]); await wait(lookTime(n));
-      if (!alive()) return;
-      SFX.flip();
-      document.querySelectorAll("#grid .card").forEach(c => { c.classList.add("down"); c.setAttribute("aria-label", "hidden card"); });
+      // the whole board is shown once, with only the first letter asked before the flip
+      G.busy = true; G.prompt = askFor(G.target, G.by);
+      await say(["look", 700, ...G.prompt]); if (!alive()) return;
+      await wait(lookTime(n)); if (!alive()) return;
+      flipAll();
       await wait(600); if (!alive()) return;
-      G.busy = false;
+      G.busy = false; ask(G.prompt, [voiceFor(G.target, G.by)]);
     }
-    setPrompt(askFor(G.target, G.by));
+    else ask(askFor(G.target, G.by));
   }
   else if (act.game === "name") {
-    G.seq = P.name.toLowerCase().replace(/[^a-z]/g, "").split("");
+    G.seq = P.slug.split("");
     renderSlots(G.seq, {hint:act.hint, firstUpper:true});
     G.busy = true; await say(["spell", "child_" + P.slug]); if (!alive()) return;
     nextSpellStep();
@@ -819,28 +906,47 @@ async function nextRound(){
 // name & words: fresh cards for every letter
 function nextSpellStep(){
   const act = G.act, u = G.seq[G.idx];
-  G.target = u; G.stepFirst = true; G.busy = false;
+  G.target = u; G.busy = false; newStep();
   G.by = (act.game === "words" && act.by === "sound" && knows(u)) ? "sound" : "name";
   const upper = act.game === "name" && G.idx === 0;
   renderCards(shuffle([u, ...distractors([u], act.cards - 1, LETTERS)]), {upper});
   markNextSlot();
-  setPrompt(askFor(u, G.by));
+  ask(askFor(u, G.by));
 }
 
 $("#grid").addEventListener("click", e => {
-  const card = e.target.closest(".card"); if (!card || G.busy) return;
-  ensureAudio();
+  const card = e.target.closest(".card"); if (!card || G.busy || G.hearing) return;   // wait for the question to finish
+  ensureAudio(); clearRepeat(); G.repeats = 0;
   if (card.dataset.u === G.target) correct(card); else wrong(card, card.dataset.u);
 });
-function wrong(card, u){
-  G.stepFirst = false;
+/* After a first miss, fade one or two wrong cards; after a second, the right card pulses. */
+function helpAfterMiss(card){
+  const cards = [...document.querySelectorAll("#grid .card")].filter(c => !c.classList.contains("gone") && !c.classList.contains("out"));
+  if (G.misses >= 2) { const t = cards.find(c => c.dataset.u === G.target); if (t) t.classList.add("hint"); return; }
+  const keep = new Set(G.act.game === "clear" ? G.seq.slice(G.idx) : [G.target]);   // never fade a card still to be found
+  const wrongs = cards.filter(c => !keep.has(c.dataset.u));
+  const fade = wrongs.includes(card) ? [card] : [];
+  for (const c of shuffle(wrongs)) { if (fade.length >= 2) break; if (!fade.includes(c)) fade.push(c); }
+  while (fade.length && cards.length - fade.length < 2) fade.pop();
+  fade.forEach(c => c.classList.add("out"));
+}
+async function wrong(card, u){
+  const t0 = performance.now(), step = G.step, sess = G.session;
+  if (t0 - G.readyAt < RAPID_MS) G.rapid++;
+  G.stepFirst = false; G.misses++; G.busy = true;
   card.classList.remove("wiggle"); void card.offsetWidth; card.classList.add("wiggle");
   if (card.classList.contains("down")) {
     card.classList.remove("down"); SFX.flip();
-    setTimeout(() => { if (!G.busy && card.isConnected) card.classList.add("down"); }, 1700);
+    setTimeout(() => { if (card.isConnected && !card.classList.contains("gone")) card.classList.add("down"); }, 1700);
   }
   SFX.wrong();
-  say([250, ...(G.by === "sound" ? ["that_says", "snd_" + u] : ["thats", "name_" + u])]);
+  // "That's M…" with the cards locked for at least a second, then "Find the B" again
+  await say([250, ...(G.by === "sound" ? ["that_says", "snd_" + u] : ["thats", "name_" + u])]);
+  const left = 1000 - (performance.now() - t0); if (left > 0) await wait(left);
+  if (G.session !== sess || G.step !== step) return;
+  helpAfterMiss(card);
+  G.busy = false; G.readyAt = performance.now();
+  if (await say([150, ...G.prompt]) && G.session === sess && G.step === step) armRepeat();
 }
 function logStep(){
   G.steps++; if (G.stepFirst) G.firstSteps++;
@@ -853,9 +959,19 @@ function logStep(){
   if (G.by === "sound" && !knows(G.target) && s.r.length >= 5 && s.r.reduce((a, b) => a + b, 0) >= 5) P.known.push(G.target);
   save();
 }
+/* Spoken praise now and then (about 1 in 3), never the same clip twice running.
+   First-try finds get a cheer; ones that needed help sometimes get "You kept trying!". */
+const PRAISE = ["praise_1","praise_2","praise_3","praise_4","praise_5","praise_6","praise_7","praise_8"];
+let lastPraise = null;
+function praise(first){
+  if (Math.random() >= 1 / 3) return [];
+  if (!first) return ["kept_trying"];
+  const k = rand(PRAISE.filter(p => p !== lastPraise)); lastPraise = k; return [k];
+}
 async function correct(card){
   G.busy = true; logStep();
-  const sess = G.session, alive = () => G.session === sess, act = G.act;
+  const sess = G.session, alive = () => G.session === sess, act = G.act, first = G.misses === 0;
+  card.classList.remove("hint");
   if (card.classList.contains("down")) { card.classList.remove("down"); SFX.flip(); }
   SFX.right();
 
@@ -869,13 +985,13 @@ async function correct(card){
     G.idx++;
     if (G.idx < G.seq.length) {
       await wait(450); if (!alive()) return;
-      G.target = G.seq[G.idx]; G.stepFirst = true;
+      G.target = G.seq[G.idx]; newStep();
       if (pips[G.idx]) pips[G.idx].classList.add("next");
-      G.busy = false; setPrompt(askFor(G.target, G.by));
+      G.busy = false; ask(askFor(G.target, G.by));
       return;
     }
     document.querySelectorAll("#grid .card:not(.gone)").forEach(c => c.classList.add("dim"));
-    await say([300, rand(["praise_1","praise_2","praise_3"])]);
+    await say([300, ...praise(G.firstSteps === G.steps)]);
     if (!alive()) return;
     return endRound(alive);
   }
@@ -884,15 +1000,13 @@ async function correct(card){
     const slot = document.querySelector(`.slot[data-i="${G.idx}"]`);
     slot.classList.remove("next"); slot.classList.add("filled"); slot.style.setProperty("--c", card.style.getPropertyValue("--c"));
     if (!slot.textContent) slot.textContent = card.textContent.trim();
-    if (act.game === "pair") card.classList.add("used");
-    else { card.classList.add("win"); document.querySelectorAll("#grid .card").forEach(c => { if (c !== card) c.classList.add("dim"); }); }
+    card.classList.add("win"); document.querySelectorAll("#grid .card").forEach(c => { if (c !== card) c.classList.add("dim"); });
     await say([150, voiceFor(G.target, G.by)]);
     if (!alive()) return;
     G.idx++;
     if (G.idx < G.seq.length) {
       await wait(200); if (!alive()) return;
-      if (act.game === "pair") { G.target = G.seq[G.idx]; G.stepFirst = true; markNextSlot(); G.busy = false; }
-      else nextSpellStep();
+      nextSpellStep();
       return;
     }
     return finishSeq(alive);
@@ -900,7 +1014,7 @@ async function correct(card){
 
   card.classList.add("win");
   document.querySelectorAll("#grid .card").forEach(c => { if (c !== card) c.classList.add("dim"); });
-  await say([200, voiceFor(G.target, G.by), 120, rand(["praise_1","praise_2","praise_3"])]);
+  await say([200, voiceFor(G.target, G.by), 120, ...praise(first)]);
   if (!alive()) return;
   endRound(alive);
 }
@@ -908,7 +1022,7 @@ async function finishSeq(alive){
   const act = G.act, slots = [...document.querySelectorAll(".slot")];
   const hl = i => slots.forEach((s, j) => s.classList.toggle("hl", j === i));
   const all = on => slots.forEach(s => s.classList.toggle("hl", on));
-  if (act.game !== "pair") $("#grid").innerHTML = "";
+  $("#grid").innerHTML = "";
   await wait(300); if (!alive()) return;
   if (act.game === "words") {
     const snd = G.seq.map(u => "snd_" + u);
@@ -922,28 +1036,31 @@ async function finishSeq(alive){
     all(true);
     if (act.game === "name") { await say([150, "child_" + P.slug]); if (!alive()) return; }
   }
-  await say([250, rand(["praise_1","praise_2","praise_3"])]); if (!alive()) return;
+  await say([250, ...praise(G.firstSteps === G.steps)]); if (!alive()) return;
   await wait(300); if (!alive()) return;
   all(false);
   endRound(alive);
 }
 
-function checkLevel(score){
+function checkLevel(score, guessy){
   if (G.practice || (G.act && G.act.id === "NAME")) return null;
   P.rounds++; P.recent.push(Math.round(score * 100) / 100); if (P.recent.length > 20) P.recent.shift();
+  P.guessy.push(guessy ? 1 : 0); if (P.guessy.length > GUESS_WINDOW) P.guessy.shift();
   let change = null;
-  if (P.level < MAX_LEVEL && P.recent.length >= UP_WINDOW && avg(P.recent.slice(-UP_WINDOW)) >= UP_SCORE) { P.level++; P.recent = []; change = "up"; }
-  else if (P.level > 1 && P.recent.length >= DOWN_WINDOW && avg(P.recent.slice(-DOWN_WINDOW)) < DOWN_SCORE) { P.level--; P.recent = []; change = "down"; }
+  const tooHard = (P.recent.length >= DOWN_WINDOW && avg(P.recent.slice(-DOWN_WINDOW)) < DOWN_SCORE)
+    || P.guessy.reduce((a, b) => a + b, 0) >= GUESS_ROUNDS;   // lots of rapid guessing: step down sooner
+  if (P.level < MAX_LEVEL && P.recent.length >= UP_WINDOW && avg(P.recent.slice(-UP_WINDOW)) >= UP_SCORE) { P.level++; P.recent = []; P.guessy = []; change = "up"; }
+  else if (P.level > 1 && tooHard) { P.level--; P.recent = []; P.guessy = []; change = "down"; }
   save(); return change;
 }
 async function endRound(alive){
-  const change = checkLevel(G.steps ? G.firstSteps / G.steps : 1);
+  const change = checkLevel(G.steps ? G.firstSteps / G.steps : 1, G.rapid >= 2);
   G.done++; renderStars(); SFX.star();
   await wait(350); if (!alive()) return;
   if (G.unlockRound) { P.nameUnlocked = true; save(); return party("unlock"); }
   if (change === "up") return party("level");          // moving down happens quietly
   if (G.practice === "NAME") return party("set");
-  if (G.done >= SET_SIZE) return party("set");
+  if (G.done >= setSize()) return party("set");
   nextRound();
 }
 
@@ -955,7 +1072,7 @@ function party(kind){
     $("#partyArt").innerHTML = `<div class="badge" aria-label="Level ${P.level}"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.6l3.1 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.4 5.6 21l1.5-7.1L1.7 9l7.2-.8z"/></svg><b>${P.level}</b></div>`;
     SFX.levelup(); setTimeout(() => say(["level_up"]), 700);
   } else if (kind === "unlock") {
-    const letters = P.name.replace(/[^a-z]/gi, "").split("");
+    const letters = nameLetters(P.name).split("");
     $("#partyArt").innerHTML = `<div class="nametiles big" aria-label="${esc(P.name)}">${letters.map((l, i) => `<span style="--c:var(${PALETTE[i % PALETTE.length]})">${i ? disp(l.toLowerCase()) : l.toUpperCase()}</span>`).join("")}</div>`;
     SFX.levelup(); setTimeout(() => say(["you_did_it", 200, "child_" + P.slug]), 700);
   } else {
@@ -966,19 +1083,20 @@ function party(kind){
 function confetti(){
   const box = $("#confetti"); box.innerHTML = "";
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const n = reduce ? 16 : 70, cols = ["#E5483F","#2E78D0","#1F9A5E","#8657D3","#EA6C1F","#E9A20F"];
+  const n = reduce ? 12 : 40, cols = ["#E5483F","#2E78D0","#1F9A5E","#8657D3","#EA6C1F","#E9A20F"];
   for (let i = 0; i < n; i++) {
     const p = document.createElement("i");
     p.style.left = Math.random() * 100 + "vw"; p.style.background = rand(cols);
-    p.style.animationDuration = (1.8 + Math.random() * 1.8) + "s"; p.style.animationDelay = Math.random() * .6 + "s";
+    p.style.animationDuration = (1.4 + Math.random() * 1.2) + "s"; p.style.animationDelay = Math.random() * .4 + "s";
     box.appendChild(p);
   }
-  setTimeout(() => box.innerHTML = "", 4500);
+  setTimeout(() => box.innerHTML = "", 3000);
 }
+$("#party").addEventListener("click", e => { if (!e.target.closest("button")) $("#confetti").innerHTML = ""; });   // tap to skip
 $("#againBtn").addEventListener("click", () => {
   SFX.tap(); stopSpeech();
-  if ((partyKind === "level" || partyKind === "unlock") && G.done < SET_SIZE) { show("play"); nextRound(); }
-  else startSession(P, G.practice);
+  if ((partyKind === "level" || partyKind === "unlock") && G.done < setSize()) { show("play"); nextRound(); }
+  else startSession(P, G.practice, G.tryLevel);
 });
 $("#partyHome").addEventListener("click", goHome);
 $("#homeBtn").addEventListener("click", goHome);
@@ -1052,8 +1170,8 @@ async function micTest(){
   let policy = null;
   if (fp && fp.allowsFeature) { policy = fp.allowsFeature("microphone"); line(policy, `Page viewer allows the microphone: ${policy ? "yes" : "no"}`); }
   else line(null, "Page viewer permission: this browser can’t report it");
-  try { const st = await navigator.permissions.query({name:"microphone"}); line(st.state !== "denied", `Chrome’s microphone setting for this site: ${st.state}`); }
-  catch(e) { line(null, "Chrome’s microphone setting: can’t be checked here"); }
+  try { const st = await navigator.permissions.query({name:"microphone"}); line(st.state !== "denied", `Browser’s microphone setting for this page: ${st.state}`); }
+  catch(e) { line(null, "Browser’s microphone setting: can’t be checked here"); }
   let ok = false;
   if (md) {
     try { const st = await navigator.mediaDevices.getUserMedia({audio:true}); st.getTracks().forEach(t => t.stop()); ok = true; line(true, "Opening the microphone: worked"); }
@@ -1061,9 +1179,9 @@ async function micTest(){
   }
   let verdict;
   if (ok) verdict = "The microphone works. Recording should work now.";
-  else if (policy === false) verdict = "The page viewer is blocking the microphone. Chrome and Android settings can’t change that; use “Import files” instead.";
+  else if (policy === false) verdict = "The page viewer is blocking the microphone. Browser and device settings can’t change that; use “Import files” instead.";
   else if (!window.isSecureContext || !md) verdict = "This browser won’t allow recording on this page. Use “Import files” instead.";
-  else verdict = "Something outside the page is blocking it. Check Chrome’s site settings for claude.ai and Android’s microphone permission for Chrome, then test again.";
+  else verdict = "Something outside the page is blocking it. Check the browser’s site settings for this page and the device’s microphone permission for the browser, then test again.";
   status(out.join("\n") + "\n\n" + verdict);
 }
 function releaseMic(){ if (rec) { try { rec.stop(); } catch(e) {} } if (mic) { mic.getTracks().forEach(t => t.stop()); mic = null; } }
@@ -1119,6 +1237,10 @@ $("#fileBackup").addEventListener("change", async e => {
       state.editId = state.profiles[0].id; save(); buildClips();
     }
     let n = 0;
+    if (j.clips && typeof j.clips === "object") {   // a restore replaces the recordings, it doesn't mix them in
+      for (const k of [...clipBlobs.keys()]) await store.del(k);
+      clipBlobs.clear(); buffers.clear();
+    }
     for (const [k, s] of Object.entries(j.clips || {})) { const b = b64ToBlob(s); clipBlobs.set(k, b); buffers.delete(k); await store.put(k, b); n++; }
     renderParent(); status(`Restored ${state.profiles.length} profile${state.profiles.length === 1 ? "" : "s"} and ${n} clip${n === 1 ? "" : "s"}.`);
   } catch(err) { status("That file isn’t a Letter Hunt backup."); }
@@ -1128,7 +1250,7 @@ $("#fileBackup").addEventListener("change", async e => {
 let recFilter = "all";
 function status(msg){ const s = $("#recStatus"); if (s) s.textContent = msg; }
 function openParent(){ stopSpeech(); G.session++; stopMusic(); if (!profById(state.editId)) state.editId = state.profiles[0].id; renderParent(); show("parent"); $("#parent").scrollTop = 0; }
-$("#closeParent").addEventListener("click", () => { releaseMic(); save(); renderHome(); show("home"); startMusic(); });
+$("#closeParent").addEventListener("click", () => { releaseMic(); save(); enterFS(); renderHome(); show("home"); startMusic(); });
 
 const ICON = {
   play:PLAY_SVG,
@@ -1217,13 +1339,15 @@ function renderParent(){
   </div>
 
   <div class="sec">
-    <h2>Sound</h2>
+    <h2>Play</h2>
+    <div class="row"><span>Rounds per set</span>${stepper("setSize", setSize(), 3, 5)}</div>
     <div class="row"><label for="musicT">Background music</label><input type="checkbox" class="toggle" id="musicT" ${state.music ? "checked" : ""}></div>
+    ${fsAvailable ? `<div class="row"><label for="fsT">Full screen<span class="small" style="display:block">Switches on when play starts. Swiping from the edge leaves it; tapping a player turns it back on.</span></label><input type="checkbox" class="toggle" id="fsT" ${state.fullscreen ? "checked" : ""}></div>` : ""}
   </div>
 
   <div class="sec">
     <h2>Your voice</h2>
-    <p class="note">Anything without a green dot uses the tablet’s robot voice. Record each clip here, or import files named like the grey code under each one (for example <code>snd_m.mp3</code>). Recordings are saved on this device only, so save a backup when you’re done.</p>
+    <p class="note">Anything without a green dot uses the device’s robot voice. Record each clip here, or import files named like the grey code under each one (for example <code>snd_m.mp3</code>). Recordings are saved on this device only, so save a backup when you’re done.</p>
     ${storeOk === false ? `<p class="note" style="color:var(--red)">This browser isn’t letting the game save anything when it’s opened this way, so recordings, imports and progress will be lost when the page closes. Open the game from a web address instead.</p>` : ""}
     <div class="rec-tools">
       <button class="btn primary" id="importMany">Import files</button>
@@ -1250,6 +1374,7 @@ $("#pBody").addEventListener("change", async e => {
   }
   else if (t.id === "nameT") { E.nameUnlocked = t.checked; save(); }
   else if (t.id === "musicT") { state.music = t.checked; save(); }
+  else if (t.id === "fsT") { state.fullscreen = t.checked; save(); if (t.checked) enterFS(); else exitFS(); }
   else if (t.id === "trimT") { state.autoTrim = t.checked; save(); }
 });
 $("#pBody").addEventListener("click", async e => {
@@ -1264,9 +1389,9 @@ $("#pBody").addEventListener("click", async e => {
   }
   const stepBtn = e.target.closest(".step button");
   if (stepBtn) {
-    const w = stepBtn.parentElement, name = w.dataset.step;
-    E[name] = Math.max(+w.dataset.min, Math.min(+w.dataset.max, E[name] + +stepBtn.dataset.d));
-    if (name === "level") E.recent = [];
+    const w = stepBtn.parentElement, name = w.dataset.step, obj = name === "setSize" ? state : E;
+    obj[name] = Math.max(+w.dataset.min, Math.min(+w.dataset.max, (name === "setSize" ? setSize() : obj[name]) + +stepBtn.dataset.d));
+    if (name === "level") { E.recent = []; E.guessy = []; }
     save(); renderParent(); return;
   }
   const chip = e.target.closest(".chip");
@@ -1276,7 +1401,7 @@ $("#pBody").addEventListener("click", async e => {
     chip.setAttribute("aria-pressed", on); return;
   }
   const tryBtn = e.target.closest("[data-try]");
-  if (tryBtn) { releaseMic(); save(); startSession(E, tryBtn.dataset.try); G.tryLevel = tryBtn.dataset.lv ? +tryBtn.dataset.lv : null; return; }
+  if (tryBtn) { releaseMic(); save(); enterFS(); startSession(E, tryBtn.dataset.try, tryBtn.dataset.lv ? +tryBtn.dataset.lv : null); return; }
   const act = e.target.closest(".ic");
   if (act) {
     const k = act.closest(".clip").dataset.k;
@@ -1293,7 +1418,7 @@ $("#pBody").addEventListener("click", async e => {
     if (E.slug && !state.profiles.some(p => p !== E && p.slug === E.slug)) await deleteClip("child_" + E.slug);
     state.profiles = state.profiles.filter(p => p !== E); state.editId = state.profiles[0].id; buildClips(); save(); renderParent();
   }
-  else if (id === "resetStats") { if (!confirm("Clear all progress for this player?")) return; E.stats = {}; E.recent = []; E.rounds = 0; E.level = 1; save(); renderParent(); }
+  else if (id === "resetStats") { if (!confirm("Clear all progress for this player?")) return; E.stats = {}; E.recent = []; E.guessy = []; E.rounds = 0; E.level = 1; save(); renderParent(); }
   else if (id === "importMany") $("#fileMany").click();
   else if (id === "micTest") micTest();
   else if (id === "backupBtn") backup();
@@ -1308,6 +1433,9 @@ store.open().then(ok => { if (storeOk !== false) storeOk = ok; if ($("#parent").
   clipBlobs = m;
   // v1 stored the name recording as "child_name"
   if (clipBlobs.has("child_name")) { const p = state.profiles.find(p => p.slug); await moveClip("child_name", p ? "child_" + p.slug : null); }
+  // names with accents used to lose letters ("Zoë" was saved as "zo")
+  for (const p of state.profiles) { const o = oldSlug(p.name);
+    if (o && p.slug && o !== p.slug && !state.profiles.some(q => q.slug === o)) await moveClip("child_" + o, "child_" + p.slug); }
   renderRecCounts();
 });
 save();
