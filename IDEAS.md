@@ -22,3 +22,22 @@ Mockup: https://claude.ai/artifact/YZZKQL9GHwqrBQba6C7PED
 - New recording: "Which sound goes with…".
 - Levels: 3 megaphones at levels 9–10, 4 megaphones at levels 11–12.
 - Fallback if dragging is too fiddly: a grown-up setting for "tap a megaphone twice to choose".
+
+## Planning session needed: long vowels and less common sounds
+
+Right now the game only uses short vowels (a as in apple) and one sound per letter, plus sh/ch/th.
+Plan how to bring in, at medium-to-higher levels:
+- Long vowels (a as in cake, "the letter says its name"), and how to present a letter with two sounds
+  without confusing the short-vowel work.
+- Less common sounds: soft c and g, "ck", "ng", "wh", "qu", voiced vs unvoiced "th", vowel teams.
+- Which games they appear in, how they're recorded, and how they show in the letter collection.
+
+## Robot Talk (oral blending): deferred
+
+Designed but not built: a robot says a word in pieces ("m… op", "mmmaaap", "m-a-p") and the child
+picks the picture; letter tiles light up as it re-blends. Deferred because the natural-sounding stages
+need per-word recordings.
+
+Idea for recordings in general: keep most clips optional so the game works right away with the robot
+voice, but let some higher-level games require recordings (e.g. Robot Talk only unlocks once its word
+recordings exist). Quick setup for immediate play; more setup unlocks more.
