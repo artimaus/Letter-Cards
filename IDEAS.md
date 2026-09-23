@@ -1,8 +1,8 @@
 # Letter Hunt – ideas backlog
 
-Ideas to discuss before building. Nothing here is in the game yet.
+Ideas to discuss before building.
 
-## Match the Sound (megaphone cards) — design agreed, not built
+## Match the Sound (megaphone cards) — built
 
 Mockup: https://claude.ai/artifact/YZZKQL9GHwqrBQba6C7PED
 
