@@ -13,7 +13,7 @@
 :root{
   --board:#C9EEDF; --board-dot:#B2E2CF; --ink:#1D2B4F; --muted:#56637F;
   --card:#FFFFFF; --edge:#D5DDEB; --back:#2E78D0; --back-dot:#4A8FE0;
-  --red:#E5483F; --yellow:#E9A20F; --green:#1F9A5E; --blue:#2E78D0; --purple:#8657D3; --orange:#EA6C1F; --teal:#168C99; --pink:#D13F7A; --indigo:#4F5BD5;
+  --red:#E5483F; --yellow:#E9A20F; --green:#1F9A5E; --blue:#2E78D0; --purple:#8657D3; --orange:#EA6C1F; --teal:#168C99; --pink:#D13F7A; --indigo:#4F5BD5; --lime:#5F9A12;
   --panel:#FFFFFF; --panel-2:#F2F6FB; --line:#DCE3EE; --ok:#1F9A5E;
   --letter:"Andika","Andika New Basic","Trebuchet MS",system-ui,sans-serif;
   --ui:"Fredoka","Andika",ui-rounded,"Trebuchet MS",system-ui,sans-serif;
@@ -33,6 +33,7 @@
   --panel:#162030; --panel-2:#1D2A3D; --line:#2B3950; --ok:#3BC07F;
 }
 *,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none!important}
 html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
 body{
   height:100%; margin:0; overflow:hidden; color:var(--ink); font-family:var(--ui);
@@ -289,6 +290,59 @@ button:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
 .meter i{display:block;height:100%;background:var(--ok);border-radius:5px}
 .small{font-size:13px;color:var(--muted);line-height:1.45}
 .ptabs{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+/* i spy pictures */
+.card.picc .front{font-size:calc(var(--cs,120px)*.56)}
+.card.picc .emo{line-height:1;transform:none}
+.card.picc.named .front{box-shadow:0 0 0 5px var(--yellow),0 calc(var(--cs,120px)*.05) 0 var(--edge)}
+.card.picc.named{transform:scale(1.06)}
+.plet{position:absolute;right:-8%;top:-8%;width:42%;aspect-ratio:1;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;
+  font:700 calc(var(--cs,120px)*.26)/1 var(--letter);box-shadow:0 4px 0 #15724A;animation:pop .5s}
+/* pick the next game */
+.grid[data-choice]{display:flex;align-items:center;justify-content:center;gap:clamp(18px,4vw,40px);flex-wrap:wrap}
+.choice{width:clamp(180px,32vw,290px);aspect-ratio:1.2;border:0;border-radius:32px;background:var(--c);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  font:600 clamp(18px,2.6vw,26px)/1.15 var(--ui);text-align:center;padding:14px;box-shadow:0 10px 0 color-mix(in srgb,var(--c) 70%,#000);transition:transform .08s,box-shadow .08s;text-shadow:0 1px 0 rgba(0,0,0,.18)}
+.choice:active{transform:translateY(8px);box-shadow:0 2px 0 color-mix(in srgb,var(--c) 70%,#000)}
+.choice svg{width:38%;height:auto}
+/* letter collection */
+.albumbtn{border:0;border-radius:999px;background:var(--card);padding:8px 16px 8px 10px;display:flex;align-items:center;gap:8px;box-shadow:0 5px 0 var(--edge);
+  font:600 18px/1 var(--ui);color:#1D2B4F}
+.albumbtn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--edge)}
+.albumbtn svg{width:30px;height:30px}
+#album{padding:10px 14px 14px}
+.albgrid{flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(74px,11vw,112px),1fr));gap:clamp(10px,1.8vw,18px);align-content:start;overflow-y:auto;padding:8px 4px 24px}
+.atile{position:relative;aspect-ratio:.86;border:0;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px}
+.atile b{font:700 clamp(34px,5.5vw,56px)/1 var(--letter)}
+.atile svg{width:52%;height:auto}
+.atile.awake{background:var(--c);color:#fff;box-shadow:0 6px 0 color-mix(in srgb,var(--c) 70%,#000)}
+.atile.asleep{background:color-mix(in srgb,var(--ink) 9%,transparent);color:color-mix(in srgb,var(--ink) 38%,transparent)}
+.atile.asleep .zz{position:absolute;top:8%;right:12%;font:600 16px/1 var(--ui)}
+.atile.pop{animation:pop .5s}
+.woke{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.woke .atile{width:clamp(76px,12vw,110px)}
+/* take a break */
+.profiles.locked .prof,.profiles.locked .namebtn{opacity:.4;filter:grayscale(.7)}
+/* recording guide */
+.howto{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:4px 14px 12px;margin:0 0 12px}
+.howto summary{cursor:pointer;font:600 16px/1.3 var(--ui);padding:10px 0}
+.howto ul{margin:0 0 12px;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14.5px;line-height:1.45}
+.kind{display:inline-block;font:600 11px/1 system-ui,sans-serif;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:4px 8px;margin-right:6px;vertical-align:1px}
+.kind.stretchy{background:color-mix(in srgb,var(--blue) 16%,transparent);color:var(--blue)}
+.kind.quick{background:color-mix(in srgb,var(--orange) 18%,transparent);color:var(--orange)}
+.rec-group h3{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.btn.sm{min-height:34px;padding:6px 12px;font-size:13px}
+.btn.recording{background:var(--red);border-color:var(--red);color:#fff}
+.gmode{position:fixed;inset:0;z-index:60;background:rgba(10,18,32,.55);display:grid;place-items:center;padding:16px}
+.gcard{width:min(560px,100%);max-height:100%;overflow:auto;background:var(--panel);border-radius:18px;padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.ghead{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:14px}
+.gbig{font:700 72px/1 var(--letter);text-align:center;padding:6px 0 0}
+.glabel{text-align:center;font-size:16px}
+.glabel small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.gtip{background:var(--panel-2);border-radius:12px;padding:10px 12px;font-size:15px;line-height:1.45}
+.gwave{width:100%;height:90px;border-radius:10px;background:var(--panel-2)}
+.gstatus{font-size:14px;color:var(--muted);min-height:1.3em;text-align:center}
+.gacts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.gacts .grec{min-width:120px}
+.pt i.bx{position:absolute;top:2px;right:4px;font:600 10px/1 system-ui,sans-serif;font-style:normal;opacity:.85}
 </style>
 </head>
 <body>
@@ -327,6 +381,15 @@ button:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
   <div class="target" id="target"></div>
   <div class="grid" id="grid"></div>
   <div class="banner" id="banner" aria-live="polite"></div>
+</section>
+
+<section id="album" class="screen">
+  <div class="bar">
+    <button class="round-btn" id="albumHome" aria-label="Back home">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.2 2.6 11a1 1 0 0 0 1.3 1.5l.6-.5V20a1 1 0 0 0 1 1h4.5v-6h4v6h4.5a1 1 0 0 0 1-1v-8l.6.5A1 1 0 0 0 21.4 11z"/></svg>
+    </button>
+  </div>
+  <div class="albgrid" id="albGrid"></div>
 </section>
 
 <section id="party" class="screen">
@@ -388,7 +451,8 @@ const LINES = {
   memL:   {name:"Memory: letters",  w:1},
   memS:   {name:"Memory: sounds",   w:1},
   words:  {name:"Spell a word",     w:1},
-  match:  {name:"Match the Sound",  w:1}
+  match:  {name:"Match the Sound",  w:1},
+  ispy:   {name:"I Spy",            w:1}
 };
 const ACTS = [
   {id:"FL3",   line:"letters", game:"find",  by:"name",  cards:3,              min:1, max:1},
@@ -416,6 +480,10 @@ const ACTS = [
   {id:"WS",    line:"words",   game:"words", by:"sound", hint:true,  cards:4,  min:8, max:10},
   {id:"WX",    line:"words",   game:"words", by:"sound", hint:false, cards:6,  min:11, max:12},
 
+  {id:"IS2",   line:"ispy",    game:"ispy",  by:"sound", cards:2, stretchy:true, min:3, max:4},
+  {id:"IS3",   line:"ispy",    game:"ispy",  by:"sound", cards:3,              min:5, max:8},
+  {id:"IS4",   line:"ispy",    game:"ispy",  by:"sound", cards:4,              min:9, max:12},
+
   {id:"MT3",   line:"match",   game:"match", by:"sound", cards:3,              min:9, max:10},
   {id:"MT4",   line:"match",   game:"match", by:"sound", cards:4,              min:11, max:12}
 ];
@@ -440,6 +508,7 @@ function actLabel(a){
     case "memory": return `Memory ${what} · ${gridName(a.cards)}`;
     case "clear":  return `Clear the board: ${what} · ${a.finds} finds, ${gridName(a.cards)}`;
     case "name":   return `Spell name · ${a.hint ? "guide letters" : "no guide"} · ${gridName(a.cards)}`;
+    case "ispy":   return `I Spy · first sounds · ${a.cards} pictures${a.stretchy ? " · stretchy sounds only" : ""}`;
     case "match":  return `Match the Sound · ${a.cards} megaphones`;
     case "words":  return `Spell a word · by ${a.by === "sound" ? "sound" : "letter name"}${a.hint ? "" : " · no guide"} · ${gridName(a.cards)}`;
   }
@@ -447,6 +516,9 @@ function actLabel(a){
 const UP_WINDOW = 10, UP_SCORE = .85, DOWN_WINDOW = 6, DOWN_SCORE = .5;
 const setSize = () => Math.max(3, Math.min(5, state.setSize || 4));   // rounds per set
 const REPEAT_MS = 12000, REPEAT_MAX = 3;   // sound questions repeat after this long with no tap
+const breakAfter = () => Math.max(1, Math.min(10, state.breakAfter || 3));   // sets before "go find a grown-up"
+const BOX_DAYS = [0, 1, 2, 4, 10, 21];     // letter review boxes: days until the next review
+const AWAKE_BOX = 3;                        // a sound "wakes up" in the letter collection at this box
 const RAPID_MS = 700;                      // a wrong tap this soon after the cards unlock counts as a guess
 const GUESS_WINDOW = 5, GUESS_ROUNDS = 3;  // this many guessy rounds out of the last few drops a level
 
@@ -457,7 +529,7 @@ const nameLetters = n => plain(n).replace(/[^a-z]/gi, "");
 const slug = n => nameLetters(n).toLowerCase();
 const oldSlug = n => (n || "").toLowerCase().replace(/[^a-z]/g, "");               // before accents were kept
 function newProfile(name = ""){
-  return {id:"p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name, level:1, style:"upper", known:[], stats:{}, recent:[], guessy:[], rounds:0};
+  return {id:"p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name, level:1, style:"upper", known:[], stats:{}, recent:[], guessy:[], boxes:{}, album:[], rounds:0};
 }
 function fixStats(st){ const o = {}; for (const [k, v] of Object.entries(st || {})) o[k] = Array.isArray(v) ? {n:v[0], f:v[1], r:[]} : v; return o; }
 let state = null;
@@ -468,8 +540,9 @@ if (!state) {
   if (old) { p.style = old.style || "upper"; p.known = old.known || []; p.stats = fixStats(old.stats); }
   state = {profiles:[p], music:old ? !!old.music : false, autoTrim:old ? old.autoTrim !== false : true, editId:p.id};
 }
-state.profiles.forEach(p => { p.stats = fixStats(p.stats); p.recent = p.recent || []; p.guessy = p.guessy || []; p.known = p.known || []; p.slug = slug(p.name); });
+state.profiles.forEach(p => { p.stats = fixStats(p.stats); p.recent = p.recent || []; p.guessy = p.guessy || []; p.boxes = p.boxes || {}; p.album = p.album || []; p.known = p.known || []; p.slug = slug(p.name); });
 if (state.setSize == null) state.setSize = 4;
+if (state.breakAfter == null) state.breakAfter = 3;
 if ((state.levelsVersion || 1) < LEVELS_VERSION) { state.profiles.forEach(migrateLevel); state.levelsVersion = LEVELS_VERSION; }
 if (state.fullscreen == null) state.fullscreen = true;
 const save = () => { try { localStorage.setItem(SKEY, JSON.stringify(state)); } catch(e) {} };
@@ -484,7 +557,12 @@ const PHRASES = [
   ["look","“Look closely!”","Memory game, before the cards flip over.","Look closely!"],
   ["spell","“Let’s spell…”","Before a name or a word.","Let's spell"],
   ["goes_with","“Which sound goes with…”","Match the Sound: a letter name plays right after it.","Which sound goes with"],
-  ["says","“…says…”","Match the Sound, after a right answer: “B says buh”.","says"],
+  ["says","“…says…”","Between a letter name and its sound: “B says buh”. Used in most games.","says"],
+  ["ispy","“I spy something that starts with…”","I Spy: a letter sound plays right after it.","I spy something that starts with"],
+  ["starts_with","“…starts with…”","I Spy: “Moon starts with mmm”.","starts with"],
+  ["pick_game","“Which game do you want to play?”","Now and then between rounds.","Which game do you want to play?"],
+  ["woke_up","“…woke up!”","When a letter wakes up in the collection.","woke up!"],
+  ["go_find","“Go find Mommy or Daddy to play again!”","After the last set, when “Take a break” is on.","Go find a grown-up to play again!"],
   ["praise_1","“Yes!”","","Yes!"],
   ["praise_2","“You found it!”","","You found it!"],
   ["praise_3","“Great job!”","","Great job!"],
@@ -495,16 +573,70 @@ const PHRASES = [
   ["praise_8","“Right!”","","Right!"],
   ["kept_trying","“You kept trying!”","Now and then, after they find it with some help.","You kept trying!"],
   ["you_did_it","“You did it!”","At the end of every set.","You did it!"],
-  ["level_up","“New games to play!”","Plays when they move up a level. Any cheer works.","New games to play!"]
+  ["level_up","“New games to play!”","Plays when they move up a level. Any cheer works.","New games to play!"],
+  ["my_praise_1","Your own cheer 1 (optional)","Anything you like. Only plays if you record it.",""],
+  ["my_praise_2","Your own cheer 2 (optional)","",""],
+  ["my_praise_3","Your own cheer 3 (optional)","",""]
 ];
+const PRAISE_KEYS = ["praise_1","praise_2","praise_3","praise_4","praise_5","praise_6","praise_7","praise_8","kept_trying","you_did_it","level_up","my_praise_1","my_praise_2","my_praise_3"];
+/* How to say each sound, shown in the recording guide. */
+const SOUND_TIPS = {
+  s:["stretchy","Hiss like a snake: “ssss”. Teeth together, no voice."], a:["stretchy","Short a, as in apple: “aaa”. Mouth open wide."],
+  t:["quick","Tongue taps behind the top teeth: a tiny puff “t”, not “tuh”."], p:["quick","Lips pop with a puff of air, no voice: “p”, not “puh”."],
+  i:["stretchy","Short i, as in itch: “iii”."], n:["stretchy","Tongue up, hum through your nose: “nnnn”."],
+  m:["stretchy","Lips together and hum: “mmmm”."], d:["quick","Tongue taps, with voice: a quick “d”. Keep any “uh” tiny."],
+  g:["quick","Back of the tongue, with voice: a quick “g”, as in goat."], o:["stretchy","Short o, as in octopus: “ooo” (close to “aw”)."],
+  c:["quick","Same as k: a quick, breathy “k”, no voice."], k:["quick","Back of the tongue: a breathy “k”, no voice."],
+  e:["stretchy","Short e, as in egg: “eee”."], u:["stretchy","Short u, as in up: “uuu”."],
+  r:["stretchy","Round your lips a little and growl: “rrrr”."], h:["quick","Just a breath, like fogging a window: “h”."],
+  b:["quick","Lips pop, with voice: a quick “b”. Keep any “uh” tiny."], f:["stretchy","Top teeth on the bottom lip, blow: “ffff”."],
+  l:["stretchy","Tongue up behind the top teeth and sing: “llll”."], j:["quick","A quick “j”, as in jam."],
+  v:["stretchy","Like f, with your voice buzzing: “vvvv”."], w:["quick","Round your lips, quick: “w”, as in web."],
+  x:["quick","X says “ks”, as at the end of fox."], y:["quick","A quick “y”, as in yes."],
+  z:["stretchy","Like s with a buzz, a busy bee: “zzzz”."], q:["quick","Q says “kw”, as in queen."],
+  sh:["stretchy","Finger to your lips: “shhhh”."], ch:["quick","A quick little sneeze: “ch”."], th:["stretchy","Tongue between your teeth, blow: “thhh”, as in thumb."]
+};
+/* I Spy pictures: [word, emoji, first sound]. No words that start with two consonants,
+   no spellings that mislead (knife, phone), and no emoji with two likely names. */
+const ISPY = [
+  ["apple","🍎","a"],["ant","🐜","a"],["alligator","🐊","a"],["axe","🪓","a"],
+  ["bus","🚌","b"],["bee","🐝","b"],["banana","🍌","b"],["bear","🐻","b"],["bed","🛏️","b"],
+  ["cat","🐱","c"],["cake","🎂","c"],["car","🚗","c"],["cow","🐮","c"],["carrot","🥕","c"],
+  ["dog","🐶","d"],["duck","🦆","d"],["door","🚪","d"],["dinosaur","🦕","d"],
+  ["egg","🥚","e"],["elephant","🐘","e"],
+  ["fish","🐟","f"],["fox","🦊","f"],["fire","🔥","f"],["foot","🦶","f"],
+  ["goat","🐐","g"],["gift","🎁","g"],["guitar","🎸","g"],["gorilla","🦍","g"],
+  ["hat","🎩","h"],["horse","🐴","h"],["house","🏠","h"],["heart","❤️","h"],
+  ["juice","🧃","j"],["jeans","👖","j"],["jellyfish","🪼","j"],
+  ["kite","🪁","k"],["key","🔑","k"],["kangaroo","🦘","k"],["koala","🐨","k"],
+  ["lion","🦁","l"],["leaf","🍃","l"],["lemon","🍋","l"],["lollipop","🍭","l"],["ladder","🪜","l"],
+  ["moon","🌙","m"],["monkey","🐒","m"],["mouse","🐭","m"],["milk","🥛","m"],["mushroom","🍄","m"],
+  ["nose","👃","n"],["nest","🪺","n"],["noodles","🍜","n"],
+  ["octopus","🐙","o"],["otter","🦦","o"],["ox","🐂","o"],
+  ["pig","🐷","p"],["pizza","🍕","p"],["pear","🍐","p"],["penguin","🐧","p"],["panda","🐼","p"],
+  ["rabbit","🐰","r"],["rainbow","🌈","r"],["robot","🤖","r"],["rocket","🚀","r"],["ring","💍","r"],
+  ["sun","☀️","s"],["sock","🧦","s"],["seal","🦭","s"],["sandwich","🥪","s"],["soap","🧼","s"],
+  ["tiger","🐯","t"],["tent","⛺","t"],["tomato","🍅","t"],["turtle","🐢","t"],["tooth","🦷","t"],
+  ["umbrella","☂️","u"],
+  ["van","🚐","v"],["violin","🎻","v"],["volcano","🌋","v"],
+  ["web","🕸️","w"],["watch","⌚","w"],["whale","🐳","w"],["worm","🪱","w"],["window","🪟","w"],
+  ["yo-yo","🪀","y"],["yarn","🧶","y"],
+  ["zebra","🦓","z"],
+  ["ship","🚢","sh"],["shoe","👟","sh"],["shell","🐚","sh"],["sheep","🐑","sh"],
+  ["chair","🪑","ch"],["cheese","🧀","ch"],["chicken","🐔","ch"],["cherries","🍒","ch"]
+].map(([w, e, s]) => ({w, e, s}));
+const ISPY_BY = {}; ISPY.forEach(x => (ISPY_BY[x.s] = ISPY_BY[x.s] || []).push(x));
+const STRETCHY_FIRST = ["m","s","f","n","l","r","v","z","sh"];         // easiest first sounds to hear
+const picClip = w => WORDS.some(x => x[0] === w) ? "word_" + w : "pic_" + w.replace(/[^a-z]/g, "");
 let CLIPS = {};
 function buildClips(){
   CLIPS = {};
-  PHRASES.forEach(([k, label, hint, t]) => CLIPS[k] = {group:"Phrases", label, hint, tts:t});
+  PHRASES.forEach(([k, label, hint, t]) => CLIPS[k] = {group:PRAISE_KEYS.includes(k) ? "Praise" : "Phrases", label, hint, tts:t});
   state.profiles.forEach(p => { if (p.slug) CLIPS["child_" + p.slug] = {group:"Names", label:p.name, hint:"Say it the way you usually do.", tts:p.name}; });
-  TEACH_ORDER.forEach(u => { const s = SOUNDS[u]; CLIPS["snd_" + u] = {group:"Letter sounds", label:`${u} says ${s[0]}`, hint:`as in “${s[1]}”`, tts:s[2]}; });
+  TEACH_ORDER.forEach(u => { const s = SOUNDS[u]; CLIPS["snd_" + u] = {group:"Letter sounds", label:`${u} says ${s[0]}`, hint:`as in “${s[1]}”`, tts:s[2], kind:SOUND_TIPS[u][0], tip:SOUND_TIPS[u][1]}; });
   LETTERS.forEach(l => CLIPS["name_" + l] = {group:"Letter names", label:`Letter ${l.toUpperCase()}`, hint:"", tts:NAME_TTS[l]});
-  WORDS.forEach(([w]) => CLIPS["word_" + w] = {group:"Words", label:`“${w}”`, hint:"", tts:w});
+  WORDS.forEach(([w]) => CLIPS["word_" + w] = {group:"Words", label:`“${w}”`, hint:"Spell a word and I Spy.", tts:w});
+  ISPY.forEach(({w, e}) => { const k = picClip(w); if (!CLIPS[k]) CLIPS[k] = {group:"Pictures", label:`${e} “${w}”`, hint:"", tts:w}; });
 }
 buildClips();
 const clipText = k => CLIPS[k] ? CLIPS[k].tts : (k.startsWith("child_") ? "friend" : "");
@@ -604,7 +736,7 @@ async function say(items, opts = {}){
   for (const s of segs) {
     if (gen !== speakGen) return false;
     if (s.wait) { await wait(s.wait); continue; }
-    if (opts.onStep && s.i !== undefined) opts.onStep(s.i);
+    if (opts.onStep && s.i !== undefined) opts.onStep(s.i, s.key);
     if (s.key) await playClip(s.key, gen); else await tts(s.tts, gen);
     if (gen !== speakGen) return false;
     await wait(gap);
@@ -681,9 +813,14 @@ function renderHome(){
       <span class="avatar" style="--c:var(${PALETTE[i % PALETTE.length]})">${initial}<span class="go">${PLAY_SVG}</span></span>
       <span class="pname">${esc(p.name || "Play")}</span>
       <span class="lvl" aria-label="Level ${p.level}">${Array.from({length:MAX_LEVEL}, (_, j) => `<i class="${j < p.level ? "on" : ""}"></i>`).join("")}</span>
-    </button>${nameUnlocked(p) ? `<button class="namebtn" data-name="${p.id}" aria-label="Spell ${esc(p.name)}"><span class="nametiles">${nameTiles(p)}</span></button>` : ""}</div>`; }).join("");
+    </button>${nameUnlocked(p) ? `<button class="namebtn" data-name="${p.id}" aria-label="Spell ${esc(p.name)}"><span class="nametiles">${nameTiles(p)}</span></button>` : ""}
+    <button class="albumbtn" data-album="${p.id}" aria-label="Letter collection">${ALBUM_SVG}<span>${awakeUnits(p).length}</span></button></div>`; }).join("");
+  $("#profiles").classList.toggle("locked", G.locked);
 }
 $("#profiles").addEventListener("click", e => {
+  const ab = e.target.closest(".albumbtn");
+  if (ab) { ensureAudio(); SFX.tap(); openAlbum(profById(ab.dataset.album)); return; }
+  if (G.locked && e.target.closest(".prof,.namebtn")) { ensureAudio(); say(["go_find"]); return; }   // taking a break
   const nb = e.target.closest(".namebtn");
   if (nb) { ensureAudio(); enterFS(); SFX.tap(); startSession(profById(nb.dataset.name), "NAME"); return; }
   const b = e.target.closest(".prof"); if (!b) return;
@@ -708,7 +845,8 @@ $("#startBtn").addEventListener("click", () => {
 /* ================= game engine ================= */
 const G = {session:0, act:null, practice:null, tryLevel:null, done:0, busy:true, hearing:false, target:null, by:"name", stepFirst:true,
   steps:0, firstSteps:0, prompt:[], recent:[], recentWords:[], lastLine:null, seq:null, idx:0, word:null, unlockRound:false,
-  step:0, misses:0, rapid:0, readyAt:0, repeatTimer:null, repeats:0, seenS:{}};
+  step:0, misses:0, rapid:0, readyAt:0, repeatTimer:null, repeats:0, seenS:{}, unit:null, paired:new Set(), promptOpts:null,
+  offered:false, choosing:null, setsPlayed:0, locked:false};
 const confGroup = u => CONFUSE.find(g => g.includes(u)) || [u];
 const knows = u => P.known.includes(u);
 
@@ -727,9 +865,24 @@ function chooseAct(){
   for (let i = 0; i < lines.length; i++) { r -= weights[i]; if (r <= 0) { line = lines[i]; break; } }
   return rand(byLine[line]);          // overlapping versions within a line share its turn
 }
+/* ---- letters remembered across days: each letter name ("l:b") and sound ("s:b") sits in a box ----
+   A first-try find moves it up a box (once per due date); a miss sends it back to box 1.
+   Targets favour letters that are due, so practice spreads out over days. */
+const today = () => Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
+const isDue = (kind, u) => { const b = P.boxes[kind + u]; return !b || b.due <= today(); };
+function reviewBox(key, firstTry){
+  const b = P.boxes[key] || {box:0, due:0};
+  if (firstTry) { if (b.due <= today()) b.box = Math.min(BOX_DAYS.length - 1, b.box + 1); }
+  else b.box = Math.min(b.box, 1);
+  b.due = today() + BOX_DAYS[b.box];
+  P.boxes[key] = b;
+}
+const preferDue = (kind, units) => { const d = units.filter(u => isDue(kind, u)); return d.length && Math.random() < .75 ? d : units; };
+const dueFirst = (kind, units) => [...units.filter(u => isDue(kind, u)), ...units.filter(u => !isDue(kind, u))];
+const awakeUnits = p => TEACH_ORDER.filter(u => ((p.boxes || {})["s:" + u] || {}).box >= AWAKE_BOX);
 function pickFresh(pool){
   const fresh = pool.filter(u => !G.recent.includes(u));
-  const t = rand(fresh.length ? fresh : pool);
+  const t = rand(preferDue("l:", fresh.length ? fresh : pool));
   G.recent.push(t); while (G.recent.length > Math.min(4, pool.length - 1)) G.recent.shift();
   return t;
 }
@@ -754,12 +907,20 @@ const leastAsked = units => shuffle(units).sort((a, b) => (G.seenS[a] || 0) - (G
 const markAsked = u => { G.seenS[u] = (G.seenS[u] || 0) + 1; };
 function pickSound(active){
   const fresh = active.filter(u => !G.recent.includes(u));
-  const t = leastAsked(fresh.length ? fresh : active)[0];
+  const t = leastAsked(preferDue("s:", fresh.length ? fresh : active))[0];
   markAsked(t);
   G.recent.push(t); while (G.recent.length > Math.min(4, active.length - 1)) G.recent.shift();
   return t;
 }
 const voiceFor = (u, by) => by === "sound" ? "snd_" + u : "name_" + u;
+/* "B says /b/" ("S-H says /sh/" for digraphs), put together from the name, "says" and sound clips */
+const pairClips = u => [...u.split("").map(l => "name_" + l), "says", "snd_" + u];
+/* What the voice says after a find: sound games always pair name and sound; letter games pair
+   the first time a letter comes up in a session, or when it took more than one try. */
+function findReply(u, by){
+  if (by === "sound" || !G.paired.has(u) || G.misses > 0) { G.paired.add(u); return pairClips(u); }
+  return ["name_" + u];
+}
 const askFor = (u, by) => by === "sound" ? ["which_says", "snd_" + u] : ["find", "name_" + u];
 
 function renderStars(){
@@ -773,6 +934,7 @@ const BANNER_ICON = {
   clear:`<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2" opacity=".35"/><rect x="3" y="13" width="8" height="8" rx="2" opacity=".35"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>`,
   word:`<svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="7" width="6" height="10" rx="1.5"/><rect x="9" y="7" width="6" height="10" rx="1.5" opacity=".8"/><rect x="16" y="7" width="6" height="10" rx="1.5" opacity=".6"/></svg>`,
   name:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17l-6.1 3.4 1.5-6.8L2.2 9l6.9-.7z"/></svg>`,
+  eye:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>`,
   mega:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 4.2v15.6a.8.8 0 0 1-1.2.7L12 17H9.4l1 3.3a1 1 0 0 1-1 1.3H7.6a1 1 0 0 1-.9-.7L5.3 17H4.5A2.5 2.5 0 0 1 2 14.5v-5A2.5 2.5 0 0 1 4.5 7H12l5.8-3.5a.8.8 0 0 1 1.2.7z"/></svg>`
 };
 function bannerFor(a){
@@ -783,6 +945,7 @@ function bannerFor(a){
     case "clear":  return s ? ["Clear the board: sounds", "--pink", "clear"] : ["Clear the board: letters", "--teal", "clear"];
     case "words":  return ["Spell a word", "--green", "word"];
     case "match":  return ["Match the Sound", "--indigo", "mega"];
+    case "ispy":   return ["I Spy", "--lime", "eye"];
     default:       return ["Spell my name", "--orange", "name"];
   }
 }
@@ -813,7 +976,7 @@ function layoutSlots(){
 window.addEventListener("resize", () => { layoutCards(); layoutSlots(); });
 
 function renderCards(units, {down = false, upper = false} = {}){
-  const cols = shuffle(PALETTE); delete $("#grid").dataset.cols;
+  const cols = shuffle(PALETTE); resetGrid();
   $("#grid").innerHTML = units.map((u, i) =>
     `<button class="card${down ? " down" : ""}" data-u="${u}" aria-label="${down ? "hidden card" : disp(u, upper)}" style="--c:var(${cols[i % cols.length]})">
        <span class="inner"><span class="face front${u.length > 1 ? " di" : ""}"><span>${disp(u, upper)}</span></span><span class="face back"></span></span>
@@ -825,13 +988,22 @@ function renderSlots(seq, {pic = null, hint = true, firstUpper = false} = {}){
     `<div class="slots">${seq.map((u, i) => `<div class="slot${hint ? "" : " blank"}${i === 0 ? " next" : ""}" data-i="${i}">${disp(u, firstUpper && i === 0)}</div>`).join("")}</div>`;
   layoutSlots();
 }
+function resetGrid(){ const g = $("#grid"); delete g.dataset.cols; delete g.dataset.choice; }
+function renderPics(pics){
+  resetGrid();
+  $("#grid").innerHTML = pics.map(p => `<button class="card picc" data-u="${p.w}" data-s="${p.s}" data-k="${picClip(p.w)}" aria-label="${p.w}">
+       <span class="inner"><span class="face front"><span class="emo">${p.e}</span></span><span class="face back"></span></span></button>`).join("");
+  requestAnimationFrame(layoutCards);
+}
+const namePic = key => document.querySelectorAll("#grid .picc").forEach(c => c.classList.toggle("named", !!key && c.dataset.k === key));
 function markNextSlot(){ document.querySelectorAll(".slot").forEach((s, i) => s.classList.toggle("next", i === G.idx)); }
 /* Say the question; cards can't be tapped until it finishes. `spoken` lets memory games
    say just the target after the flip while the speaker button keeps the full question. */
 async function ask(prompt, spoken = prompt){
   G.prompt = prompt; G.hearing = true;
   const step = G.step, sess = G.session;
-  await say(spoken);
+  await say(spoken, spoken === prompt && G.promptOpts ? G.promptOpts : {});
+  namePic(null);
   if (G.step !== step || G.session !== sess) return;
   G.hearing = false; G.readyAt = performance.now(); armRepeat();
 }
@@ -845,13 +1017,13 @@ function armRepeat(){
     G.repeats++; ask(G.prompt);
   }, REPEAT_MS);
 }
-function newStep(){ G.step++; G.misses = 0; G.repeats = 0; G.stepFirst = true; clearRepeat();
+function newStep(){ G.step++; G.misses = 0; G.repeats = 0; G.stepFirst = true; G.unit = null; clearRepeat();
   document.querySelectorAll("#grid .card.hint").forEach(c => c.classList.remove("hint")); }
 $("#speakBtn").addEventListener("click", () => { ensureAudio(); if (G.prompt.length && !G.busy && !G.hearing) { G.repeats = 0; ask(G.prompt); } });
 
 function startSession(profile, practiceId = null, tryLevel = null){
   stopSpeech(); G.session++;
-  P = profile; G.practice = practiceId; G.tryLevel = tryLevel; G.done = 0; G.recent = []; G.seenS = {}; G.lastLine = null; G.unlockRound = false;
+  P = profile; G.practice = practiceId; G.tryLevel = tryLevel; G.done = 0; G.recent = []; G.seenS = {}; G.paired = new Set(); G.offered = false; G.lastLine = null; G.unlockRound = false;
   $("#target").innerHTML = ""; $("#grid").innerHTML = ""; $("#banner").innerHTML = "";
   show("play"); renderStars(); startMusic();
   const sess = G.session; setTimeout(() => { if (G.session === sess) nextRound(); }, 250);
@@ -859,10 +1031,33 @@ function startSession(profile, practiceId = null, tryLevel = null){
 
 const lookTime = n => Math.round((1600 + n * 380) * 1.2);   // how long the cards stay face-up after the question
 function flipAll(){ SFX.flip(); document.querySelectorAll("#grid .card").forEach(c => { c.classList.add("down"); c.setAttribute("aria-label", "hidden card"); }); }
+/* Now and then (at most once a set, never on the first round) he picks the next game from two. */
+function choiceActs(){
+  if (G.practice || G.done < 1 || G.offered || (P.level >= NAME_UNLOCK && P.slug && !P.nameUnlocked)) return null;
+  const byLine = {};
+  levelActs(P.level).forEach(a => (byLine[a.line] = byLine[a.line] || []).push(a));
+  const lines = shuffle(Object.keys(byLine).filter(l => l !== G.lastLine));
+  if (lines.length < 2 || Math.random() >= .4) return null;
+  return lines.slice(0, 2).map(l => rand(byLine[l]));
+}
+function offerChoice(acts){
+  return new Promise(res => {
+    stopSpeech(); newStep(); G.busy = false; G.hearing = false; G.by = "name"; G.prompt = ["pick_game"];
+    $("#target").innerHTML = ""; $("#banner").innerHTML = "";
+    const grid = $("#grid"); resetGrid(); grid.dataset.choice = "1";
+    grid.innerHTML = acts.map((a, i) => { const [label, c, icon] = bannerFor(a);
+      return `<button class="choice" data-i="${i}" style="--c:var(${c})">${BANNER_ICON[icon]}<span>${label}</span></button>`; }).join("");
+    G.choosing = i => { G.choosing = null; res(acts[i]); };
+    say(["pick_game"]);
+  });
+}
 async function nextRound(){
   G.unlockRound = false;
-  const act = chooseAct(); G.act = act; G.lastLine = act.line;
-  G.steps = 0; G.firstSteps = 0; G.rapid = 0; G.seq = null; G.idx = 0; G.busy = false; G.hearing = false; newStep();
+  const sess0 = G.session, choices = choiceActs();
+  let picked = null;
+  if (choices) { G.offered = true; picked = await offerChoice(choices); if (G.session !== sess0) return; }
+  const act = picked || chooseAct(); G.act = act; G.lastLine = act.line;
+  G.steps = 0; G.firstSteps = 0; G.rapid = 0; G.seq = null; G.idx = 0; G.busy = false; G.hearing = false; newStep(); G.promptOpts = null;
   $("#target").innerHTML = ""; setBanner(act);
   const sess = G.session, alive = () => G.session === sess;
   const n = act.cards;
@@ -899,13 +1094,13 @@ async function nextRound(){
     let targets = [], pool = LETTERS;
     if (act.by === "sound") {
       const sp = soundPools(n); pool = sp.pool;
-      for (const u of [...leastAsked(sp.active), ...shuffle(pool)]) {
+      for (const u of [...dueFirst("s:", leastAsked(sp.active)), ...shuffle(pool)]) {
         if (targets.length >= act.finds) break;
         if (!targets.some(t => confGroup(t).includes(u))) targets.push(u);
       }
       targets.forEach(markAsked);
     } else {
-      for (const u of shuffle(LETTERS.filter(l => !G.recent.includes(l)))) {
+      for (const u of dueFirst("l:", shuffle(LETTERS.filter(l => !G.recent.includes(l))))) {
         if (targets.length >= act.finds) break;
         if (!targets.some(t => confGroup(t).includes(u))) targets.push(u);
       }
@@ -931,6 +1126,23 @@ async function nextRound(){
     renderSlots(G.seq, {hint:act.hint, firstUpper:true});
     G.busy = true; await say(["spell", "child_" + P.slug]); if (!alive()) return;
     nextSpellStep();
+  }
+  else if (act.game === "ispy") {
+    // "I spy something that starts with /m/… moon, cat, sun": each picture is named as it lights up
+    G.by = "sound";
+    const {active} = soundPools(n), ok = u => ISPY_BY[u] && (!act.stretchy || STRETCHY_FIRST.includes(u));
+    let cand = active.filter(ok); if (!cand.length) cand = Object.keys(ISPY_BY).filter(ok);
+    G.unit = pickSound(cand);
+    const word = rand(ISPY_BY[G.unit]), others = [];
+    for (const o of shuffle(ISPY.filter(x => !soundClash(x.s, G.unit)))) {
+      if (others.length >= n - 1) break;
+      if (!others.some(x => soundClash(x.s, o.s))) others.push(o);
+    }
+    const pics = shuffle([word, ...others]);
+    G.target = word.w;
+    renderPics(pics);
+    G.promptOpts = {gap:260, onStep:(i, key) => namePic(key)};
+    ask(["ispy", "snd_" + G.unit, 500, ...pics.map(x => picClip(x.w))]);
   }
   else if (act.game === "match") {
     // one letter, a row of megaphones; drag the one whose sound goes with the letter
@@ -979,7 +1191,7 @@ const megaVars = el => ["--m1","--m2","--m3"].map(v => `${v}:${el.style.getPrope
 function renderMatch(t, units){
   const pal = shuffle(MEGA_PAL), grid = $("#grid");
   $("#target").innerHTML = `<div class="mdrop" id="mdrop"><div class="mletter${t.length > 1 ? " di" : ""}" style="--c:var(${rand(PALETTE)})"><span>${disp(t)}</span></div></div>`;
-  grid.dataset.cols = units.length;
+  resetGrid(); grid.dataset.cols = units.length;
   grid.innerHTML = units.map((u, i) => { const [a, b, c] = pal[i % pal.length];
     return `<button class="card mega" data-u="${u}" aria-label="Play a sound" style="--m1:${a};--m2:${b};--m3:${c}"><span class="mface">${MEGA_SVG}${WAVES_SVG}${BADGE_SVG}</span></button>`; }).join("");
   requestAnimationFrame(layoutCards);
@@ -1050,12 +1262,14 @@ async function matchCorrect(el){
   L.insertAdjacentHTML("beforeend", `<span class="tuck" style="${megaVars(el)}">${MEGA_SVG}</span>`);
   L.classList.remove("win"); void L.offsetWidth; L.classList.add("win");
   document.querySelectorAll("#grid .mega").forEach(c => { if (c !== el) c.classList.add("dim"); });
-  await say([150, "name_" + G.target, "says", "snd_" + G.target, 120, ...praise(first)]);   // "B says buh"
+  await say([150, ...pairClips(G.target), 120, ...praise(first)]);   // "B says buh"
   if (!alive()) return;
   endRound(alive);
 }
 
 $("#grid").addEventListener("click", e => {
+  const ch = e.target.closest(".choice");
+  if (ch) { if (G.choosing) { ensureAudio(); SFX.tap(); stopSpeech(); G.choosing(+ch.dataset.i); } return; }
   if (G.act && G.act.game === "match") return;                       // megaphones use the drag handlers above
   const card = e.target.closest(".card"); if (!card || G.busy || G.hearing) return;   // wait for the question to finish
   ensureAudio(); clearRepeat(); G.repeats = 0;
@@ -1083,32 +1297,47 @@ async function wrong(card, u){
   }
   SFX.wrong();
   // "That's M…" with the cards locked for at least a second, then "Find the B" again
-  await say([250, ...(G.by === "sound" ? ["that_says", "snd_" + u] : ["thats", "name_" + u])]);
+  if (G.act.game === "ispy") {                 // "That's cat. Cat starts with /k/."
+    const k = picClip(u); await say([250, "thats", k, 150, k, "starts_with", "snd_" + card.dataset.s]);
+  }
+  else await say([250, ...(G.by === "sound" ? ["that_says", "snd_" + u] : ["thats", "name_" + u])]);
   const left = 1000 - (performance.now() - t0); if (left > 0) await wait(left);
   if (G.session !== sess || G.step !== step) return;
   helpAfterMiss(card);
   G.busy = false; G.readyAt = performance.now();
-  if (await say([150, ...G.prompt]) && G.session === sess && G.step === step) armRepeat();
+  const again = await say([150, ...G.prompt], G.promptOpts || {}); namePic(null);
+  if (again && G.session === sess && G.step === step) armRepeat();
 }
 function logStep(){
   G.steps++; if (G.stepFirst) G.firstSteps++;
   if (G.practice) return;
-  const k = (G.by === "sound" ? "s:" : "l:") + G.target;
+  const u = G.unit || G.target, k = (G.by === "sound" ? "s:" : "l:") + u;
+  reviewBox(k, G.stepFirst);
   const s = P.stats[k] || {n:0, f:0, r:[]};
   s.n++; if (G.stepFirst) s.f++; s.r.push(G.stepFirst ? 1 : 0); if (s.r.length > 6) s.r.shift();
   P.stats[k] = s;
   // a sound counts as known once found first-try 5 of the last 6 times
-  if (G.by === "sound" && !knows(G.target) && s.r.length >= 5 && s.r.reduce((a, b) => a + b, 0) >= 5) P.known.push(G.target);
+  if (G.by === "sound" && !knows(u) && s.r.length >= 5 && s.r.reduce((a, b) => a + b, 0) >= 5) P.known.push(u);
   save();
 }
 /* Spoken praise now and then (about 1 in 3), never the same clip twice running.
-   First-try finds get a cheer; ones that needed help sometimes get "You kept trying!". */
-const PRAISE = ["praise_1","praise_2","praise_3","praise_4","praise_5","praise_6","praise_7","praise_8"];
+   Picking from a pool of cheers that are all fine here:
+   - any recorded ones? play one of those (never silence);
+   - none of these recorded, but other cheers are? the grown-up skipped these, so stay quiet;
+   - no cheers recorded at all? the robot voice reads one (your own cheers have no robot version). */
+const PRAISE = ["praise_1","praise_2","praise_3","praise_4","praise_5","praise_6","praise_7","praise_8","my_praise_1","my_praise_2","my_praise_3"];
 let lastPraise = null;
+function pickPraise(pool){
+  const one = list => { const c = list.filter(k => k !== lastPraise), k = rand(c.length ? c : list); lastPraise = k; return [k]; };
+  const rec = pool.filter(hasClip);
+  if (rec.length) return one(rec);
+  if (PRAISE_KEYS.some(hasClip)) return [];
+  const robot = pool.filter(k => clipText(k));
+  return robot.length ? one(robot) : [];
+}
 function praise(first){
   if (Math.random() >= 1 / 3) return [];
-  if (!first) return ["kept_trying"];
-  const k = rand(PRAISE.filter(p => p !== lastPraise)); lastPraise = k; return [k];
+  return pickPraise(first ? PRAISE : ["kept_trying"]);
 }
 async function correct(card){
   G.busy = true; logStep();
@@ -1121,7 +1350,7 @@ async function correct(card){
     card.classList.add("win");
     const pips = document.querySelectorAll(".pip");
     if (pips[G.idx]) { pips[G.idx].classList.remove("next"); pips[G.idx].classList.add("on"); }
-    await say([150, voiceFor(G.target, G.by)]);
+    await say([150, ...findReply(G.target, G.by)]);
     if (!alive()) return;
     card.classList.remove("win"); card.classList.add("gone");
     G.idx++;
@@ -1156,7 +1385,13 @@ async function correct(card){
 
   card.classList.add("win");
   document.querySelectorAll("#grid .card").forEach(c => { if (c !== card) c.classList.add("dim"); });
-  await say([200, voiceFor(G.target, G.by), 120, ...praise(first)]);
+  if (act.game === "ispy") {                   // "Moon starts with /m/. M says /m/."
+    card.querySelector(".front").insertAdjacentHTML("beforeend", `<span class="plet">${disp(G.unit)}</span>`);
+    await say([200, picClip(G.target), "starts_with", "snd_" + G.unit, 300, ...pairClips(G.unit), 120, ...praise(first)]);
+    if (!alive()) return;
+    return endRound(alive);
+  }
+  await say([200, ...findReply(G.target, G.by), 120, ...praise(first)]);
   if (!alive()) return;
   endRound(alive);
 }
@@ -1212,16 +1447,27 @@ function party(kind){
   partyKind = kind; show("party"); confetti();
   if (kind === "level") {
     $("#partyArt").innerHTML = `<div class="badge" aria-label="Level ${P.level}"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.6l3.1 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.4 5.6 21l1.5-7.1L1.7 9l7.2-.8z"/></svg><b>${P.level}</b></div>`;
-    SFX.levelup(); setTimeout(() => say(["level_up"]), 700);
+    SFX.levelup(); setTimeout(() => say(pickPraise(["level_up"])), 700);
   } else if (kind === "unlock") {
     const letters = nameLetters(P.name).split("");
     $("#partyArt").innerHTML = `<div class="nametiles big" aria-label="${esc(P.name)}">${letters.map((l, i) => `<span style="--c:var(${PALETTE[i % PALETTE.length]})">${i ? disp(l.toLowerCase()) : l.toUpperCase()}</span>`).join("")}</div>`;
-    SFX.levelup(); setTimeout(() => say(["you_did_it", 200, "child_" + P.slug]), 700);
+    SFX.levelup(); setTimeout(() => say([...pickPraise(["you_did_it"]), 200, "child_" + P.slug]), 700);
   } else {
-    $("#partyArt").innerHTML = `<div class="trophy" aria-hidden="true">🌟</div>`;
-    SFX.cheer(); setTimeout(() => say(["you_did_it"]), 500);
+    // letters whose sound reached the collection's "awake" box since the last celebration
+    const woke = G.practice ? [] : awakeUnits(P).filter(u => !P.album.includes(u));
+    if (woke.length) { P.album.push(...woke); save(); }
+    $("#partyArt").innerHTML = `<div class="trophy" aria-hidden="true">🌟</div>` +
+      (woke.length ? `<div class="woke">${woke.slice(0, 4).map((u, i) => albumTile(u, true, i)).join("")}</div>` : "");
+    const wokeSay = woke.length ? [400, ...woke.slice(0, 3).flatMap(u => [...u.split("").map(l => "name_" + l), 150]), "woke_up"] : [];
+    SFX.cheer(); setTimeout(() => say([...pickPraise(["you_did_it","my_praise_1","my_praise_2","my_praise_3"]), ...wokeSay]), 500);
   }
+  // "Take a break": after the chosen number of sets, no play button; a tap goes home
+  if (kind === "set" && !G.practice) G.setsPlayed++;
+  const brk = kind === "set" && !G.practice && state.breakOn && G.setsPlayed >= breakAfter();
+  $("#againBtn").hidden = brk;
+  if (brk) partyKind = "break";
 }
+function takeBreak(){ G.locked = true; goHome(); setTimeout(() => say(["go_find"]), 300); }
 function confetti(){
   const box = $("#confetti"); box.innerHTML = "";
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1234,13 +1480,38 @@ function confetti(){
   }
   setTimeout(() => box.innerHTML = "", 3000);
 }
-$("#party").addEventListener("click", e => { if (!e.target.closest("button")) $("#confetti").innerHTML = ""; });   // tap to skip
+$("#party").addEventListener("click", e => {
+  if (e.target.closest("button")) return;
+  if (partyKind === "break") return takeBreak();
+  $("#confetti").innerHTML = "";               // tap to skip
+});
 $("#againBtn").addEventListener("click", () => {
   SFX.tap(); stopSpeech();
   if ((partyKind === "level" || partyKind === "unlock") && G.done < setSize()) { show("play"); nextRound(); }
   else startSession(P, G.practice, G.tryLevel);
 });
-$("#partyHome").addEventListener("click", goHome);
+$("#partyHome").addEventListener("click", () => partyKind === "break" ? takeBreak() : goHome());
+
+/* ================= letter collection ================= */
+const ALBUM_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" fill="#FFD66B"/><path d="M4 21V5"/><path d="M12 7l1.2 2.5 2.8.3-2.1 1.9.6 2.7-2.5-1.4-2.5 1.4.6-2.7-2.1-1.9 2.8-.3z" fill="#E9A20F" stroke="none"/></svg>`;
+const FACE_AWAKE = `<svg viewBox="0 0 40 20" aria-hidden="true"><circle cx="11" cy="6" r="3.2" fill="currentColor"/><circle cx="29" cy="6" r="3.2" fill="currentColor"/><path d="M13 13q7 6 14 0" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>`;
+const FACE_ASLEEP = `<svg viewBox="0 0 40 20" aria-hidden="true"><path d="M7 6q4 4 8 0M25 6q4 4 8 0" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M16 15h8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>`;
+function albumTile(u, awake, i){
+  return `<button class="atile ${awake ? "awake" : "asleep"}" data-u="${u}" style="--c:var(${PALETTE[i % PALETTE.length]})" aria-label="${awake ? u + ", awake" : "sleeping letter"}">
+    <b>${disp(u)}</b>${awake ? FACE_AWAKE : FACE_ASLEEP + '<span class="zz">z</span>'}</button>`;
+}
+function openAlbum(p){
+  P = p; const awake = new Set(awakeUnits(p));
+  $("#albGrid").innerHTML = TEACH_ORDER.map((u, i) => albumTile(u, awake.has(u), i)).join("");
+  show("album");
+}
+$("#albGrid").addEventListener("click", e => {
+  const t = e.target.closest(".atile"); if (!t) return;
+  ensureAudio(); t.classList.remove("pop", "wiggle"); void t.offsetWidth;
+  if (t.classList.contains("awake")) { t.classList.add("pop"); say(pairClips(t.dataset.u)); }
+  else { t.classList.add("pop"); SFX.tap(); }
+});
+$("#albumHome").addEventListener("click", goHome);
 $("#homeBtn").addEventListener("click", goHome);
 function goHome(){ stopSpeech(); G.session++; G.busy = true; SFX.tap(); $("#confetti").innerHTML = ""; renderHome(); show("home"); }
 
@@ -1282,7 +1553,7 @@ async function storeClip(k, blob){
 async function deleteClip(k){ clipBlobs.delete(k); buffers.delete(k); await store.del(k); }
 
 let mic = null, rec = null, recKey = null, recTimer = null;
-async function toggleRecord(k, btn){
+async function toggleRecord(k, btn, onDone){
   if (rec && recKey === k) { rec.stop(); return; }
   if (rec) return;
   ensureAudio(); stopSpeech();
@@ -1298,6 +1569,7 @@ async function toggleRecord(k, btn){
     const ok = await storeClip(k, new Blob(chunks, {type}));
     status(ok ? `Saved “${CLIPS[k].label}”.` : "That recording couldn’t be read. Try again.");
     refreshClipRow(k); if (ok) say([k]);
+    if (onDone) onDone(ok);
   };
   rec.start(); status(`Recording “${CLIPS[k].label}”… tap the red button to stop.`);
   recTimer = setTimeout(() => { if (rec && recKey === k) rec.stop(); }, 6000);
@@ -1392,8 +1664,8 @@ $("#fileBackup").addEventListener("change", async e => {
 /* ================= grown-up panel ================= */
 let recFilter = "all";
 function status(msg){ const s = $("#recStatus"); if (s) s.textContent = msg; }
-function openParent(){ stopSpeech(); G.session++; stopMusic(); if (!profById(state.editId)) state.editId = state.profiles[0].id; renderParent(); show("parent"); $("#parent").scrollTop = 0; }
-$("#closeParent").addEventListener("click", () => { releaseMic(); save(); enterFS(); renderHome(); show("home"); startMusic(); });
+function openParent(){ stopSpeech(); G.session++; stopMusic(); G.locked = false; G.setsPlayed = 0; if (!profById(state.editId)) state.editId = state.profiles[0].id; renderParent(); show("parent"); $("#parent").scrollTop = 0; }
+$("#closeParent").addEventListener("click", () => { releaseMic(); guide = null; renderGuide(); save(); enterFS(); renderHome(); show("home"); startMusic(); });
 
 const ICON = {
   play:PLAY_SVG,
@@ -1406,7 +1678,7 @@ const stepper = (name, val, min, max) => `<div class="step" data-step="${name}" 
 function clipRow(k){
   const c = CLIPS[k], has = hasClip(k);
   return `<div class="clip" data-k="${k}"><span class="dot${has ? " has" : ""}" title="${has ? "Your recording" : "Robot placeholder"}"></span>
-    <div class="lbl">${esc(c.label)}${c.hint ? `<small>${c.hint}</small>` : ""}<code>${k}</code></div>
+    <div class="lbl">${c.kind ? `<span class="kind ${c.kind}">${c.kind}</span>` : ""}${esc(c.label)}${c.hint ? `<small>${c.hint}</small>` : ""}${c.tip ? `<small>${c.tip}</small>` : ""}<code>${k}</code></div>
     <div class="acts">
       <button class="ic" data-act="play" aria-label="Play">${ICON.play}</button>
       <button class="ic" data-act="rec" aria-label="Record">${ICON.rec}</button>
@@ -1428,7 +1700,8 @@ function progressTiles(E, prefix, units){
   return `<div class="prog">${units.map(u => { const s = E.stats[prefix + u];
     let cls = ""; if (s && s.n >= 2) { const r = s.f / s.n; cls = r >= .8 ? "g" : r >= .5 ? "y" : "r"; }
     const t = E.style === "upper" ? u.toUpperCase() : u;
-    return `<div class="pt ${cls}" title="${s ? `${s.f} of ${s.n} on the first try` : "not played yet"}">${t}${s ? `<small>${s.f}/${s.n}</small>` : ""}</div>`; }).join("")}</div>`;
+    const b = (E.boxes || {})[prefix + u];
+    return `<div class="pt ${cls}" title="${s ? `${s.f} of ${s.n} on the first try` : "not played yet"}${b ? ` · review box ${b.box}` : ""}">${t}${s ? `<small>${s.f}/${s.n}</small>` : ""}${b ? `<i class="bx">${b.box}</i>` : ""}</div>`; }).join("")}</div>`;
 }
 function levelMap(E){
   return Array.from({length:MAX_LEVEL}, (_, i) => {
@@ -1442,7 +1715,7 @@ function renderParent(){
   const E = profById(state.editId) || state.profiles[0];
   const who = E.name || "your child";
   const r = E.recent.slice(-UP_WINDOW), score = Math.round(avg(r) * 100);
-  const groups = ["Letter sounds","Names","Phrases","Letter names","Words"];
+  const groups = ["Letter sounds","Names","Praise","Phrases","Letter names","Words","Pictures"];
   const keys = Object.keys(CLIPS).filter(k => recFilter === "all" || !hasClip(k));
   $("#pBody").innerHTML = `
   <div class="sec">
@@ -1475,7 +1748,7 @@ function renderParent(){
 
   <div class="sec">
     <h2>How ${esc(who)} is doing</h2>
-    <p class="note">First-try finds out of total finds. Green is 80% or more, yellow 50–79%, red below 50%.</p>
+    <p class="note">First-try finds out of total finds. Green is 80% or more, yellow 50–79%, red below 50%. The small number is the review box (0–5): a letter found first try on its review day moves up a box and comes back later (next day, 2, 4, 10, then 21 days); a miss sends it back to box 1. A sound “wakes up” in ${esc(who)}’s letter collection at box ${AWAKE_BOX}.</p>
     <h3 style="font:600 15px system-ui;margin:10px 0 6px;color:var(--muted)">Letters</h3>${progressTiles(E, "l:", LETTERS)}
     <h3 style="font:600 15px system-ui;margin:16px 0 6px;color:var(--muted)">Sounds</h3>${progressTiles(E, "s:", TEACH_ORDER)}
     <div style="margin-top:14px"><button class="btn danger" id="resetStats">Clear progress and go back to level 1</button></div>
@@ -1484,6 +1757,8 @@ function renderParent(){
   <div class="sec">
     <h2>Play</h2>
     <div class="row"><span>Rounds per set</span>${stepper("setSize", setSize(), 3, 5)}</div>
+    <div class="row"><label for="breakT">Take a break<span class="small" style="display:block">After a few sets the play button goes away, and a tap goes home with “Go find Mommy or Daddy to play again!”. Opening these settings lets play start again.</span></label><input type="checkbox" class="toggle" id="breakT" ${state.breakOn ? "checked" : ""}></div>
+    ${state.breakOn ? `<div class="row"><span>Sets before a break</span>${stepper("breakAfter", breakAfter(), 1, 10)}</div>` : ""}
     <div class="row"><label for="musicT">Background music</label><input type="checkbox" class="toggle" id="musicT" ${state.music ? "checked" : ""}></div>
     ${fsAvailable ? `<div class="row"><label for="fsT">Full screen<span class="small" style="display:block">Switches on when play starts. Swiping from the edge leaves it; tapping a player turns it back on.</span></label><input type="checkbox" class="toggle" id="fsT" ${state.fullscreen ? "checked" : ""}></div>` : ""}
   </div>
@@ -1500,8 +1775,20 @@ function renderParent(){
     </div>
     <div class="row" style="border-top:0"><span class="filter"><span id="recCount"></span></span>${seg("recFilter", [["all","All"],["missing","Not recorded"]], recFilter)}</div>
     <div class="row" style="border-top:0;padding-top:0"><label for="trimT">Trim silence automatically</label><input type="checkbox" class="toggle" id="trimT" ${state.autoTrim ? "checked" : ""}></div>
+    <details class="howto" open>
+      <summary>How to record letter sounds</summary>
+      <ul>
+        <li>Everything works with the robot voice, so record as much or as little as you like. The letter sounds make the biggest difference: the robot can’t say single sounds well.</li>
+        <li><b>Stretchy sounds</b> (m, s, f, n, l, r, v, z, sh, th and the vowels): hold them for 1–2 seconds, “mmmm”, “ssss”.</li>
+        <li><b>Quick sounds</b> (b, d, g, p, t, k, c, j, ch, h, w, y): short and crisp, with no “uh” on the end: “b”, not “buh”. Whispering p, t, k and h helps. b, d and g always carry a little voice, and that’s fine.</li>
+        <li><b>Vowels</b> use their short sound: a as in apple, e as in egg, i as in itch, o as in octopus, u as in up.</li>
+        <li>Somewhere quiet, about a hand’s width from the tablet. Step-by-step mode counts you in, records, and plays it back. The picture of the sound helps: a quick sound should look like a short blip; a long tail usually means an extra “uh”.</li>
+        <li>Cheers: record any you like. If you record some, only recorded ones are played; ones you skip stay quiet instead of using the robot.</li>
+      </ul>
+      <button class="btn primary" data-guide="Letter sounds">Record sounds step by step</button>
+    </details>
     <div class="status" id="recStatus" role="status"></div>
-    <div>${groups.map(g => { const ks = keys.filter(k => CLIPS[k].group === g); return ks.length ? `<div class="rec-group"><h3>${g}</h3>${ks.map(clipRow).join("")}</div>` : ""; }).join("") || `<p class="note" style="margin-top:12px">Every clip is recorded.</p>`}</div>
+    <div>${groups.map(g => { const ks = keys.filter(k => CLIPS[k].group === g); return ks.length ? `<div class="rec-group"><h3>${g}<button class="btn sm" data-guide="${g}">Step through</button></h3>${ks.map(clipRow).join("")}</div>` : ""; }).join("") || `<p class="note" style="margin-top:12px">Every clip is recorded.</p>`}</div>
   </div>`;
   renderRecCounts();
 }
@@ -1517,6 +1804,7 @@ $("#pBody").addEventListener("change", async e => {
   }
   else if (t.id === "nameT") { E.nameUnlocked = t.checked; save(); }
   else if (t.id === "musicT") { state.music = t.checked; save(); }
+  else if (t.id === "breakT") { state.breakOn = t.checked; save(); renderParent(); }
   else if (t.id === "fsT") { state.fullscreen = t.checked; save(); if (t.checked) enterFS(); else exitFS(); }
   else if (t.id === "trimT") { state.autoTrim = t.checked; save(); }
 });
@@ -1532,8 +1820,8 @@ $("#pBody").addEventListener("click", async e => {
   }
   const stepBtn = e.target.closest(".step button");
   if (stepBtn) {
-    const w = stepBtn.parentElement, name = w.dataset.step, obj = name === "setSize" ? state : E;
-    obj[name] = Math.max(+w.dataset.min, Math.min(+w.dataset.max, (name === "setSize" ? setSize() : obj[name]) + +stepBtn.dataset.d));
+    const w = stepBtn.parentElement, name = w.dataset.step, cur = {setSize, breakAfter}[name], obj = cur ? state : E;
+    obj[name] = Math.max(+w.dataset.min, Math.min(+w.dataset.max, (cur ? cur() : obj[name]) + +stepBtn.dataset.d));
     if (name === "level") { E.recent = []; E.guessy = []; }
     save(); renderParent(); return;
   }
@@ -1543,6 +1831,8 @@ $("#pBody").addEventListener("click", async e => {
     E.known = on ? [...E.known, u] : E.known.filter(x => x !== u); save();
     chip.setAttribute("aria-pressed", on); return;
   }
+  const gb = e.target.closest("[data-guide]");
+  if (gb) { openGuide(gb.dataset.guide); return; }
   const tryBtn = e.target.closest("[data-try]");
   if (tryBtn) { releaseMic(); save(); enterFS(); startSession(E, tryBtn.dataset.try, tryBtn.dataset.lv ? +tryBtn.dataset.lv : null); return; }
   const act = e.target.closest(".ic");
@@ -1561,11 +1851,81 @@ $("#pBody").addEventListener("click", async e => {
     if (E.slug && !state.profiles.some(p => p !== E && p.slug === E.slug)) await deleteClip("child_" + E.slug);
     state.profiles = state.profiles.filter(p => p !== E); state.editId = state.profiles[0].id; buildClips(); save(); renderParent();
   }
-  else if (id === "resetStats") { if (!confirm("Clear all progress for this player?")) return; E.stats = {}; E.recent = []; E.guessy = []; E.rounds = 0; E.level = 1; save(); renderParent(); }
+  else if (id === "resetStats") { if (!confirm("Clear all progress for this player?")) return; E.stats = {}; E.recent = []; E.guessy = []; E.boxes = {}; E.album = []; E.rounds = 0; E.level = 1; save(); renderParent(); }
   else if (id === "importMany") $("#fileMany").click();
   else if (id === "micTest") micTest();
   else if (id === "backupBtn") backup();
   else if (id === "restoreBtn") $("#fileBackup").click();
+});
+
+/* ================= step-by-step recording ================= */
+let guide = null;   // {group, keys, i}
+function guideKeys(group){
+  let ks = group === "Letter sounds" ? TEACH_ORDER.map(u => "snd_" + u) : Object.keys(CLIPS).filter(k => CLIPS[k].group === group);
+  if (recFilter === "missing") { const miss = ks.filter(k => !hasClip(k)); if (miss.length) ks = miss; }
+  return ks;
+}
+function openGuide(group){ ensureAudio(); guide = {group, keys:guideKeys(group), i:0}; renderGuide(); }
+function guideBig(k){
+  const m = /^(snd|name)_(.+)$/.exec(k); if (m) return esc(disp(m[2]));
+  const pic = ISPY.find(x => picClip(x.w) === k); if (pic) return pic.e;
+  const w = WORDS.find(x => "word_" + x[0] === k); if (w) return w[1];
+  return "";
+}
+function renderGuide(){
+  let box = $("#guideBox");
+  if (!guide) { if (box) box.remove(); return; }
+  if (!box) { box = document.createElement("div"); box.id = "guideBox"; box.className = "gmode"; $("#parent").appendChild(box); }
+  const k = guide.keys[guide.i], c = CLIPS[k], last = guide.i >= guide.keys.length - 1;
+  box.innerHTML = `<div class="gcard" role="dialog" aria-modal="true" aria-label="Record step by step">
+    <div class="ghead"><span>${esc(guide.group)} · ${guide.i + 1} of ${guide.keys.length}</span><button class="ic" data-g="close" aria-label="Close">${ICON.del}</button></div>
+    ${guideBig(k) ? `<div class="gbig">${guideBig(k)}</div>` : ""}
+    <div class="glabel">${esc(c.label)}${c.hint ? `<small>${c.hint}</small>` : ""}</div>
+    ${c.tip ? `<div class="gtip"><span class="kind ${c.kind}">${c.kind === "stretchy" ? "stretchy · hold it 1–2 s" : "quick · short, no “uh”"}</span>${c.tip}</div>` : ""}
+    <canvas class="gwave" id="gWave" width="600" height="90" aria-label="Picture of the recording"></canvas>
+    <div class="gstatus" id="gStatus">${hasClip(k) ? "Recorded. Play it back, or record it again." : "Not recorded yet: the robot voice fills in."}</div>
+    <div class="gacts">
+      <button class="btn" data-g="prev" ${guide.i ? "" : "disabled"}>Back</button>
+      <button class="btn" data-g="play">${hasClip(k) ? "Play" : "Hear robot"}</button>
+      <button class="btn primary grec" data-g="rec">Record</button>
+      <button class="btn" data-g="next">${last ? "Finish" : "Next"}</button>
+    </div></div>`;
+  drawWave(k);
+}
+async function drawWave(k){
+  const cv = $("#gWave"); if (!cv) return;
+  const g = cv.getContext("2d"), W = cv.width, H = cv.height, css = getComputedStyle(document.documentElement);
+  g.clearRect(0, 0, W, H);
+  g.fillStyle = css.getPropertyValue("--line").trim() || "#DCE3EE"; g.fillRect(0, H / 2 - .5, W, 1);
+  const buf = hasClip(k) ? await getBuffer(k) : null;
+  if (!buf || !cv.isConnected) return;
+  const d = buf.getChannelData(0), step = Math.max(1, Math.floor(d.length / W));
+  g.fillStyle = css.getPropertyValue("--blue").trim() || "#2E78D0";
+  for (let x = 0; x < W; x++) {
+    let lo = 1, hi = -1;
+    for (let i = x * step, e = Math.min(d.length, i + step); i < e; i++) { const v = d[i]; if (v < lo) lo = v; if (v > hi) hi = v; }
+    if (hi < lo) continue;
+    g.fillRect(x, H / 2 - hi * H * .46, 1, Math.max(1, (hi - lo) * H * .46));
+  }
+}
+$("#parent").addEventListener("click", async e => {
+  const b = e.target.closest("[data-g]"); if (!b || !guide) return;
+  const k = guide.keys[guide.i], a = b.dataset.g, st = $("#gStatus");
+  if (a === "close") { if (rec) rec.stop(); guide = null; renderGuide(); renderParent(); return; }
+  if (a === "prev" || a === "next") {
+    if (rec) return;
+    if (a === "next" && guide.i >= guide.keys.length - 1) { guide = null; renderGuide(); renderParent(); return; }
+    guide.i += a === "next" ? 1 : -1; renderGuide(); return;
+  }
+  if (a === "play") { ensureAudio(); say([k]); return; }
+  if (a === "rec") {
+    if (rec && recKey === k) { rec.stop(); return; }
+    if (rec || b.dataset.counting) return;
+    b.dataset.counting = "1"; stopSpeech();
+    for (const n of ["3", "2", "1"]) { b.textContent = n; st.textContent = "Get ready…"; await wait(550); if (!b.isConnected) return; }
+    delete b.dataset.counting; b.textContent = "Stop"; st.textContent = "Recording… say it once, then tap Stop.";
+    toggleRecord(k, b, ok => { if (guide) { renderGuide(); const s2 = $("#gStatus"); if (s2) s2.textContent = ok ? "Saved. Listen: does it sound right?" : "That didn’t record. Try again."; } });
+  }
 });
 
 /* ================= boot ================= */
