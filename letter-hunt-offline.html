@@ -224,7 +224,7 @@ button:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
 .dot.has{background:var(--ok)}
 .clip .lbl{font-size:15px;line-height:1.3;min-width:0}
 .clip .lbl small{display:block;color:var(--muted);font-size:13px}
-.clip .lbl code{font-size:12px;color:var(--muted)}
+.clip .lbl code{display:block;font-size:12px;color:var(--muted)}
 .clip .acts{display:flex;gap:6px}
 .ic{width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--panel);display:grid;place-items:center;padding:0}
 .ic svg{width:20px;height:20px}
@@ -550,14 +550,14 @@ const profById = id => state.profiles.find(p => p.id === id);
 
 /* ================= clip catalogue ================= */
 const PHRASES = [
-  ["find","“Find the…”","Say it as if a letter name comes next.","Find the"],
+  ["find","“Find the…”","Say it as if a letter name comes next (“Find the… B”). Don’t say “letter”.","Find the"],
   ["which_says","“Which letter says…”","A sound clip plays right after it.","Which letter says"],
-  ["thats","“That’s…”","Before a letter name, after a wrong tap.","That's"],
+  ["thats","“That’s…”","Before a letter name, after a wrong tap (“That’s… M”).","That's"],
   ["that_says","“That one says…”","Before a sound, after a wrong tap.","That one says"],
   ["look","“Look closely!”","Memory game, before the cards flip over.","Look closely!"],
   ["spell","“Let’s spell…”","Before a name or a word.","Let's spell"],
   ["goes_with","“Which sound goes with…”","Match the Sound: a letter name plays right after it.","Which sound goes with"],
-  ["says","“…says…”","Between a letter name and its sound: “B says buh”. Used in most games.","says"],
+  ["says","“…says…”","Between a letter name and its sound: “B says /b/”. Used in most games.","says"],
   ["ispy","“I spy something that starts with…”","I Spy: a letter sound plays right after it.","I spy something that starts with"],
   ["starts_with","“…starts with…”","I Spy: “Moon starts with mmm”.","starts with"],
   ["pick_game","“Which game do you want to play?”","Now and then between rounds.","Which game do you want to play?"],
@@ -633,10 +633,10 @@ function buildClips(){
   CLIPS = {};
   PHRASES.forEach(([k, label, hint, t]) => CLIPS[k] = {group:PRAISE_KEYS.includes(k) ? "Praise" : "Phrases", label, hint, tts:t});
   state.profiles.forEach(p => { if (p.slug) CLIPS["child_" + p.slug] = {group:"Names", label:p.name, hint:"Say it the way you usually do.", tts:p.name}; });
-  TEACH_ORDER.forEach(u => { const s = SOUNDS[u]; CLIPS["snd_" + u] = {group:"Letter sounds", label:`${u} says ${s[0]}`, hint:`as in “${s[1]}”`, tts:s[2], kind:SOUND_TIPS[u][0], tip:SOUND_TIPS[u][1]}; });
-  LETTERS.forEach(l => CLIPS["name_" + l] = {group:"Letter names", label:`Letter ${l.toUpperCase()}`, hint:"", tts:NAME_TTS[l]});
-  WORDS.forEach(([w]) => CLIPS["word_" + w] = {group:"Words", label:`“${w}”`, hint:"Spell a word and I Spy.", tts:w});
-  ISPY.forEach(({w, e}) => { const k = picClip(w); if (!CLIPS[k]) CLIPS[k] = {group:"Pictures", label:`${e} “${w}”`, hint:"", tts:w}; });
+  TEACH_ORDER.forEach(u => { const s = SOUNDS[u]; CLIPS["snd_" + u] = {group:"Letter sounds", label:`${u.toUpperCase()}: just the sound ${s[0]}`, hint:`Only the sound, nothing before it. ${u === "x" ? "As at the end of “fox”." : `As at the start of “${s[1]}”.`}`, tts:s[2], kind:SOUND_TIPS[u][0], tip:SOUND_TIPS[u][1]}; });
+  LETTERS.forEach(l => CLIPS["name_" + l] = {group:"Letter names", label:`${l.toUpperCase()}: just the name “${NAME_TTS[l]}”`, hint:`Only the letter’s name. Not “letter ${l.toUpperCase()}” or “the ${l.toUpperCase()}”: the game adds “Find the…” and “That’s…” itself.`, tts:NAME_TTS[l]});
+  WORDS.forEach(([w]) => CLIPS["word_" + w] = {group:"Words", label:`“${w}”`, hint:"Just the word, no “a” or “the”. Used in Spell a word and I Spy.", tts:w});
+  ISPY.forEach(({w, e}) => { const k = picClip(w); if (!CLIPS[k]) CLIPS[k] = {group:"Pictures", label:`${e} “${w}”`, hint:"Just the word, no “a” or “the”.", tts:w}; });
 }
 buildClips();
 const clipText = k => CLIPS[k] ? CLIPS[k].tts : (k.startsWith("child_") ? "friend" : "");
@@ -1033,11 +1033,14 @@ const lookTime = n => Math.round((1600 + n * 380) * 1.2);   // how long the card
 function flipAll(){ SFX.flip(); document.querySelectorAll("#grid .card").forEach(c => { c.classList.add("down"); c.setAttribute("aria-label", "hidden card"); }); }
 /* Now and then (at most once a set, never on the first round) he picks the next game from two. */
 function choiceActs(){
-  if (G.practice || G.done < 1 || G.offered || (P.level >= NAME_UNLOCK && P.slug && !P.nameUnlocked)) return null;
+  if (G.practice || G.done < 1 || G.offered || state.choiceFreq === "never" || (P.level >= NAME_UNLOCK && P.slug && !P.nameUnlocked)) return null;
   const byLine = {};
   levelActs(P.level).forEach(a => (byLine[a.line] = byLine[a.line] || []).push(a));
   const lines = shuffle(Object.keys(byLine).filter(l => l !== G.lastLine));
-  if (lines.length < 2 || Math.random() >= .4) return null;
+  if (lines.length < 2) return null;
+  // "Sometimes": about one set in four; "Often": about half the sets; spread over the rounds of that set
+  const perSet = state.choiceFreq === "often" ? .5 : state.choiceFreq === "never" ? 0 : .25;
+  if (Math.random() >= perSet / Math.max(1, setSize() - 1)) return null;
   return lines.slice(0, 2).map(l => rand(byLine[l]));
 }
 function offerChoice(acts){
@@ -1297,8 +1300,8 @@ async function wrong(card, u){
   }
   SFX.wrong();
   // "That's M…" with the cards locked for at least a second, then "Find the B" again
-  if (G.act.game === "ispy") {                 // "That's cat. Cat starts with /k/."
-    const k = picClip(u); await say([250, "thats", k, 150, k, "starts_with", "snd_" + card.dataset.s]);
+  if (G.act.game === "ispy") {                 // "Cat starts with /k/."
+    await say([250, picClip(u), "starts_with", "snd_" + card.dataset.s]);
   }
   else await say([250, ...(G.by === "sound" ? ["that_says", "snd_" + u] : ["thats", "name_" + u])]);
   const left = 1000 - (performance.now() - t0); if (left > 0) await wait(left);
@@ -1678,7 +1681,7 @@ const stepper = (name, val, min, max) => `<div class="step" data-step="${name}" 
 function clipRow(k){
   const c = CLIPS[k], has = hasClip(k);
   return `<div class="clip" data-k="${k}"><span class="dot${has ? " has" : ""}" title="${has ? "Your recording" : "Robot placeholder"}"></span>
-    <div class="lbl">${c.kind ? `<span class="kind ${c.kind}">${c.kind}</span>` : ""}${esc(c.label)}${c.hint ? `<small>${c.hint}</small>` : ""}${c.tip ? `<small>${c.tip}</small>` : ""}<code>${k}</code></div>
+    <div class="lbl">${c.kind ? `<span class="kind ${c.kind}">${c.kind}</span>` : ""}${esc(c.label)}<code>${k}</code>${c.hint ? `<small>${c.hint}</small>` : ""}${c.tip ? `<small>${c.tip}</small>` : ""}</div>
     <div class="acts">
       <button class="ic" data-act="play" aria-label="Play">${ICON.play}</button>
       <button class="ic" data-act="rec" aria-label="Record">${ICON.rec}</button>
@@ -1759,6 +1762,7 @@ function renderParent(){
     <div class="row"><span>Rounds per set</span>${stepper("setSize", setSize(), 3, 5)}</div>
     <div class="row"><label for="breakT">Take a break<span class="small" style="display:block">After a few sets the play button goes away, and a tap goes home with “Go find Mommy or Daddy to play again!”. Opening these settings lets play start again.</span></label><input type="checkbox" class="toggle" id="breakT" ${state.breakOn ? "checked" : ""}></div>
     ${state.breakOn ? `<div class="row"><span>Sets before a break</span>${stepper("breakAfter", breakAfter(), 1, 10)}</div>` : ""}
+    <div class="row"><span>Let ${esc(who)} pick the next game<span class="small" style="display:block">Two big game buttons now and then between rounds.</span></span>${seg("choiceFreq", [["never","Never"],["sometimes","Sometimes"],["often","Often"]], state.choiceFreq || "sometimes")}</div>
     <div class="row"><label for="musicT">Background music</label><input type="checkbox" class="toggle" id="musicT" ${state.music ? "checked" : ""}></div>
     ${fsAvailable ? `<div class="row"><label for="fsT">Full screen<span class="small" style="display:block">Switches on when play starts. Swiping from the edge leaves it; tapping a player turns it back on.</span></label><input type="checkbox" class="toggle" id="fsT" ${state.fullscreen ? "checked" : ""}></div>` : ""}
   </div>
@@ -1783,6 +1787,7 @@ function renderParent(){
         <li><b>Quick sounds</b> (b, d, g, p, t, k, c, j, ch, h, w, y): short and crisp, with no “uh” on the end: “b”, not “buh”. Whispering p, t, k and h helps. b, d and g always carry a little voice, and that’s fine.</li>
         <li><b>Vowels</b> use their short sound: a as in apple, e as in egg, i as in itch, o as in octopus, u as in up.</li>
         <li>Somewhere quiet, about a hand’s width from the tablet. Step-by-step mode counts you in, records, and plays it back. The picture of the sound helps: a quick sound should look like a short blip; a long tail usually means an extra “uh”.</li>
+        <li><b>Say only the part on the label.</b> The game joins clips together: “Find the…” + “B”, “Which letter says…” + “b”, “B” + “says” + “b”, “Moon” + “starts with” + “mmm”. So a letter name is just “bee” (not “letter B”), a sound is just “b”, and a word is just “moon” (no “a” or “the”).</li>
         <li>Cheers: record any you like. If you record some, only recorded ones are played; ones you skip stay quiet instead of using the robot.</li>
       </ul>
       <button class="btn primary" data-guide="Letter sounds">Record sounds step by step</button>
@@ -1814,6 +1819,7 @@ $("#pBody").addEventListener("click", async e => {
   if (segBtn) {
     const name = segBtn.parentElement.dataset.set, v = segBtn.dataset.v;
     if (name === "recFilter") recFilter = v;
+    else if (name === "choiceFreq") state.choiceFreq = v;
     else if (name === "editId") state.editId = v;
     else E[name] = v;
     save(); renderParent(); return;
