@@ -355,10 +355,8 @@ const CONFUSE = [["b","d","p","q"],["m","w"],["n","u","h"],["i","l","j"],["c","o
 const PALETTE = ["--red","--blue","--green","--purple","--orange","--yellow"];
 
 /* ================= progression ================= */
-const MAX_LEVEL = 10;
-/* Each game "line" has one version per level, on a growing grid (2×2, 3×3, 4×4).
-   Find the letter and find the sound retire after three levels. The memory lines are replaced
-   three levels after they start by their clear-the-board version, which grows the same way.
+const MAX_LEVEL = 12;
+/* Each game "line" gets a bigger board as the levels go up; 3×3 is the main board for most of the game.
    An activity is available from level `min` through `max`; past `max` it's gone for good. */
 const LINES = {
   letters:{name:"Find the letter",  w:1},
@@ -368,39 +366,43 @@ const LINES = {
   words:  {name:"Spell a word",     w:1}
 };
 const ACTS = [
-  {id:"FL4",   line:"letters", game:"find",  by:"name",  cards:4,              min:1, max:1},
-  {id:"FL9",   line:"letters", game:"find",  by:"name",  cards:9,              min:2, max:2},
-  {id:"FL16",  line:"letters", game:"find",  by:"name",  cards:16,             min:3, max:3},
+  {id:"FL3",   line:"letters", game:"find",  by:"name",  cards:3,              min:1, max:1},
+  {id:"FL4",   line:"letters", game:"find",  by:"name",  cards:4,              min:2, max:3},
+  {id:"FL9",   line:"letters", game:"find",  by:"name",  cards:9,              min:4, max:5},
+  {id:"FL16",  line:"letters", game:"find",  by:"name",  cards:16,             min:6, max:7},
 
   {id:"FS3",   line:"sounds",  game:"find",  by:"sound", cards:3,              min:2, max:2},
-  {id:"FS4",   line:"sounds",  game:"find",  by:"sound", cards:4,              min:3, max:3},
-  {id:"FS9",   line:"sounds",  game:"find",  by:"sound", cards:9,              min:4, max:4},
+  {id:"FS4",   line:"sounds",  game:"find",  by:"sound", cards:4,              min:3, max:4},
+  {id:"FS9",   line:"sounds",  game:"find",  by:"sound", cards:9,              min:5, max:8},
 
-  {id:"ML4",   line:"memL",    game:"memory", by:"name", cards:4,              min:3, max:3},
-  {id:"ML9",   line:"memL",    game:"memory", by:"name", cards:9,              min:4, max:4},
-  {id:"ML16",  line:"memL",    game:"memory", by:"name", cards:16,             min:5, max:5},
-  {id:"MCL4",  line:"memL",    game:"clear", down:true, by:"name",  cards:4,  finds:3, min:6, max:6},
-  {id:"MCL9",  line:"memL",    game:"clear", down:true, by:"name",  cards:9,  finds:5, min:7, max:7},
-  {id:"MCL16", line:"memL",    game:"clear", down:true, by:"name",  cards:16, finds:6, min:8, max:10},
+  {id:"ML3",   line:"memL",    game:"memory", by:"name", cards:3,              min:3, max:3},
+  {id:"ML4",   line:"memL",    game:"memory", by:"name", cards:4,              min:4, max:5},
+  {id:"ML9",   line:"memL",    game:"memory", by:"name", cards:9,              min:6, max:7},
+  {id:"MCL9",  line:"memL",    game:"clear", down:true, by:"name",  cards:9,  finds:5, min:8, max:10},
+  {id:"MCL16", line:"memL",    game:"clear", down:true, by:"name",  cards:16, finds:6, min:11, max:12},
 
-  {id:"MS3",   line:"memS",    game:"memory", by:"sound", cards:3,             min:4, max:4},
-  {id:"MS4",   line:"memS",    game:"memory", by:"sound", cards:4,             min:5, max:5},
-  {id:"MS9",   line:"memS",    game:"memory", by:"sound", cards:9,             min:6, max:6},
-  {id:"MCS3",  line:"memS",    game:"clear", down:true, by:"sound", cards:3,  finds:2, min:7, max:7},
-  {id:"MCS4",  line:"memS",    game:"clear", down:true, by:"sound", cards:4,  finds:3, min:8, max:8},
-  {id:"MCS9",  line:"memS",    game:"clear", down:true, by:"sound", cards:9,  finds:5, min:9, max:10},
+  {id:"MS3",   line:"memS",    game:"memory", by:"sound", cards:3,             min:6, max:6},
+  {id:"MS4",   line:"memS",    game:"memory", by:"sound", cards:4,             min:7, max:7},
+  {id:"MS9",   line:"memS",    game:"memory", by:"sound", cards:9,             min:8, max:9},
+  {id:"MCS4",  line:"memS",    game:"clear", down:true, by:"sound", cards:4,  finds:3, min:10, max:10},
+  {id:"MCS9",  line:"memS",    game:"clear", down:true, by:"sound", cards:9,  finds:5, min:11, max:12},
 
-  {id:"W",     line:"words",   game:"words", by:"name",  hint:true,  cards:4,  min:4, max:7},
-  {id:"WS",    line:"words",   game:"words", by:"sound", hint:true,  cards:4,  min:6, max:9},
-  {id:"WX",    line:"words",   game:"words", by:"sound", hint:false, cards:6,  min:8, max:10}
+  {id:"W",     line:"words",   game:"words", by:"name",  hint:true,  cards:4,  min:5, max:7},
+  {id:"WS",    line:"words",   game:"words", by:"sound", hint:true,  cards:4,  min:8, max:10},
+  {id:"WX",    line:"words",   game:"words", by:"sound", hint:false, cards:6,  min:11, max:12}
 ];
 /* Spell my name: unlocks at level 5 (always the first game there), then lives on its own
    button on the home screen. It gets harder with the player's level. */
 const NAME_UNLOCK = 5;
 function nameAct(level){
-  const v = level >= 8 ? {hint:false, cards:16} : level >= 7 ? {hint:false, cards:9} : level >= 6 ? {hint:true, cards:9} : {hint:true, cards:4};
+  const v = level >= 11 ? {hint:false, cards:16} : level >= 9 ? {hint:false, cards:9} : level >= 7 ? {hint:true, cards:9}
+          : level >= 6 ? {hint:true, cards:4} : {hint:true, cards:3};
   return {id:"NAME", line:"name", game:"name", by:"name", ...v};
 }
+/* Levels were renumbered when the table grew from 10 to 12 levels. Each old level maps to the
+   new level with the same kind of games, rounding down. */
+const LEVELS_VERSION = 2, OLD_TO_NEW = [0, 1, 2, 4, 5, 6, 7, 8, 10, 11, 11];
+function migrateLevel(p){ p.level = OLD_TO_NEW[Math.max(1, Math.min(10, p.level || 1))]; p.recent = []; p.guessy = []; }
 const ACT = Object.fromEntries(ACTS.map(a => [a.id, a]));
 const gridName = n => ({4:"2×2", 9:"3×3", 16:"4×4"})[n] || `${n} cards`;
 function actLabel(a){
@@ -408,7 +410,7 @@ function actLabel(a){
   switch (a.game) {
     case "find":   return `${a.by === "sound" ? "Find the sound" : "Find the letter"} · ${gridName(a.cards)}`;
     case "memory": return `Memory ${what} · ${gridName(a.cards)}`;
-    case "clear":  return `${a.down ? "Memory clear" : "Clear the board"} ${what} · ${a.finds} finds, ${gridName(a.cards)}`;
+    case "clear":  return `Clear the board: ${what} · ${a.finds} finds, ${gridName(a.cards)}`;
     case "name":   return `Spell name · ${a.hint ? "guide letters" : "no guide"} · ${gridName(a.cards)}`;
     case "words":  return `Spell a word · by ${a.by === "sound" ? "sound" : "letter name"}${a.hint ? "" : " · no guide"} · ${gridName(a.cards)}`;
   }
@@ -439,6 +441,7 @@ if (!state) {
 }
 state.profiles.forEach(p => { p.stats = fixStats(p.stats); p.recent = p.recent || []; p.guessy = p.guessy || []; p.known = p.known || []; p.slug = slug(p.name); });
 if (state.setSize == null) state.setSize = 4;
+if ((state.levelsVersion || 1) < LEVELS_VERSION) { state.profiles.forEach(migrateLevel); state.levelsVersion = LEVELS_VERSION; }
 if (state.fullscreen == null) state.fullscreen = true;
 const save = () => { try { localStorage.setItem(SKEY, JSON.stringify(state)); } catch(e) {} };
 const profById = id => state.profiles.find(p => p.id === id);
@@ -1219,13 +1222,13 @@ async function backup(){
   const clips = {}; for (const [k, b] of clipBlobs) clips[k] = await blobToB64(b);
   const profiles = state.profiles.map(({slug, ...p}) => p);
   if (!downloads) {
-    const data = JSON.stringify({app:"letter-hunt", version:2, profiles, clips});
+    const data = JSON.stringify({app:"letter-hunt", version:3, profiles, clips});
     const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], {type:"application/json"}));
     a.download = "letter-hunt-backup.json"; document.body.appendChild(a); a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
     status("Backup saved to your downloads."); return;
   }
-  try { await downloads.save({filename:"letter-hunt-backup.json", data:JSON.stringify({app:"letter-hunt", version:2, profiles, clips})}); status("Backup saved."); }
+  try { await downloads.save({filename:"letter-hunt-backup.json", data:JSON.stringify({app:"letter-hunt", version:3, profiles, clips})}); status("Backup saved."); }
   catch(e) { if (!e || e.code !== "declined") status("The backup couldn’t be saved here."); }
 }
 $("#fileBackup").addEventListener("change", async e => {
@@ -1234,6 +1237,7 @@ $("#fileBackup").addEventListener("change", async e => {
     const j = JSON.parse(await f.text());
     if (Array.isArray(j.profiles) && j.profiles.length) {
       state.profiles = j.profiles.map(p => Object.assign(newProfile(), p, {stats:fixStats(p.stats), slug:slug(p.name)}));
+      if ((j.version || 2) < 3) state.profiles.forEach(migrateLevel);   // backup from before the 12-level table
       state.editId = state.profiles[0].id; save(); buildClips();
     }
     let n = 0;
