@@ -13,7 +13,7 @@
 :root{
   --board:#C9EEDF; --board-dot:#B2E2CF; --ink:#1D2B4F; --muted:#56637F;
   --card:#FFFFFF; --edge:#D5DDEB; --back:#2E78D0; --back-dot:#4A8FE0;
-  --red:#E5483F; --yellow:#E9A20F; --green:#1F9A5E; --blue:#2E78D0; --purple:#8657D3; --orange:#EA6C1F; --teal:#168C99; --pink:#D13F7A;
+  --red:#E5483F; --yellow:#E9A20F; --green:#1F9A5E; --blue:#2E78D0; --purple:#8657D3; --orange:#EA6C1F; --teal:#168C99; --pink:#D13F7A; --indigo:#4F5BD5;
   --panel:#FFFFFF; --panel-2:#F2F6FB; --line:#DCE3EE; --ok:#1F9A5E;
   --letter:"Andika","Andika New Basic","Trebuchet MS",system-ui,sans-serif;
   --ui:"Fredoka","Andika",ui-rounded,"Trebuchet MS",system-ui,sans-serif;
@@ -150,6 +150,30 @@ button:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
   background:var(--c,var(--blue));color:#fff;font:600 clamp(18px,2.6vw,24px)/1.1 var(--ui);text-shadow:0 1px 0 rgba(0,0,0,.18);
   box-shadow:0 5px 0 color-mix(in srgb,var(--c,var(--blue)) 70%,#000)}
 .banner:empty{display:none}
+/* match the sound */
+.mdrop{padding:clamp(8px,1.6vh,14px);border-radius:36px;border:4px dashed color-mix(in srgb,var(--ink) 28%,transparent);transition:background .2s,border-color .2s}
+.mdrop.hot{border-color:var(--yellow);border-style:solid;background:color-mix(in srgb,var(--yellow) 14%,transparent)}
+.mletter{position:relative;width:clamp(110px,20vh,190px);aspect-ratio:190/215;border-radius:28px;background:var(--card);color:var(--c);
+  box-shadow:0 8px 0 var(--edge),0 14px 24px rgba(20,40,80,.14);display:grid;place-items:center;font:700 clamp(80px,15vh,150px)/1 var(--letter)}
+.mletter.di{font-size:clamp(56px,10vh,100px)}
+.mletter.win{animation:pop .55s}
+.mletter .tuck{position:absolute;right:-14%;bottom:-10%;width:44%;aspect-ratio:1;border-radius:50%;background:var(--card);box-shadow:0 4px 0 var(--edge);display:grid;place-items:center;animation:pop .5s}
+.mletter .tuck svg{width:74%;height:74%}
+.card.mega{touch-action:none}
+.mface{position:absolute;inset:0;border-radius:calc(var(--cs,120px)*.16);background:var(--card);display:grid;place-items:center;transition:transform .2s;
+  box-shadow:0 calc(var(--cs,120px)*.05) 0 var(--edge),0 calc(var(--cs,120px)*.09) calc(var(--cs,120px)*.12) rgba(20,40,80,.16)}
+.mface .mg{width:70%;height:70%}
+.mface .wv{position:absolute;right:1%;top:50%;width:16%;height:36%;transform:translateY(-50%);opacity:0}
+.card.mega.playing .mface{transform:translateY(-8%) scale(1.06)}
+.card.mega.playing .wv{opacity:1;animation:wave .6s ease-in-out infinite alternate}
+.mbadge{position:absolute;top:-8px;right:-8px;width:clamp(28px,calc(var(--cs,120px)*.24),44px);aspect-ratio:1;border-radius:50%;background:#8C97AE;border:4px solid var(--board);display:grid;place-items:center}
+.mbadge svg{width:55%;height:55%;color:#fff}
+.mbadge .ok,.card.mega.heard .mbadge .tp{display:none}
+.card.mega.heard .mbadge{background:var(--ok)}
+.card.mega.heard .mbadge .ok{display:block}
+.card.mega.dragging{z-index:5;transition:none}
+.card.mega.dragging .mface{transform:rotate(-8deg) scale(1.08);box-shadow:0 22px 34px rgba(20,40,80,.28),0 9px 0 var(--edge)}
+.card.hint .mface{outline:5px solid var(--yellow);outline-offset:3px}
 .banner svg{width:1.35em;height:1.35em;flex:none}
 @keyframes wiggle{20%{transform:rotate(-7deg)}40%{transform:rotate(6deg)}60%{transform:rotate(-4deg)}80%{transform:rotate(2deg)}}
 @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.22)}70%{transform:scale(.96)}100%{transform:scale(1)}}
@@ -363,7 +387,8 @@ const LINES = {
   sounds: {name:"Find the sound",   w:1},
   memL:   {name:"Memory: letters",  w:1},
   memS:   {name:"Memory: sounds",   w:1},
-  words:  {name:"Spell a word",     w:1}
+  words:  {name:"Spell a word",     w:1},
+  match:  {name:"Match the Sound",  w:1}
 };
 const ACTS = [
   {id:"FL3",   line:"letters", game:"find",  by:"name",  cards:3,              min:1, max:1},
@@ -389,7 +414,10 @@ const ACTS = [
 
   {id:"W",     line:"words",   game:"words", by:"name",  hint:true,  cards:4,  min:5, max:7},
   {id:"WS",    line:"words",   game:"words", by:"sound", hint:true,  cards:4,  min:8, max:10},
-  {id:"WX",    line:"words",   game:"words", by:"sound", hint:false, cards:6,  min:11, max:12}
+  {id:"WX",    line:"words",   game:"words", by:"sound", hint:false, cards:6,  min:11, max:12},
+
+  {id:"MT3",   line:"match",   game:"match", by:"sound", cards:3,              min:9, max:10},
+  {id:"MT4",   line:"match",   game:"match", by:"sound", cards:4,              min:11, max:12}
 ];
 /* Spell my name: unlocks at level 5 (always the first game there), then lives on its own
    button on the home screen. It gets harder with the player's level. */
@@ -412,6 +440,7 @@ function actLabel(a){
     case "memory": return `Memory ${what} · ${gridName(a.cards)}`;
     case "clear":  return `Clear the board: ${what} · ${a.finds} finds, ${gridName(a.cards)}`;
     case "name":   return `Spell name · ${a.hint ? "guide letters" : "no guide"} · ${gridName(a.cards)}`;
+    case "match":  return `Match the Sound · ${a.cards} megaphones`;
     case "words":  return `Spell a word · by ${a.by === "sound" ? "sound" : "letter name"}${a.hint ? "" : " · no guide"} · ${gridName(a.cards)}`;
   }
 }
@@ -454,6 +483,8 @@ const PHRASES = [
   ["that_says","“That one says…”","Before a sound, after a wrong tap.","That one says"],
   ["look","“Look closely!”","Memory game, before the cards flip over.","Look closely!"],
   ["spell","“Let’s spell…”","Before a name or a word.","Let's spell"],
+  ["goes_with","“Which sound goes with…”","Match the Sound: a letter name plays right after it.","Which sound goes with"],
+  ["says","“…says…”","Match the Sound, after a right answer: “B says buh”.","says"],
   ["praise_1","“Yes!”","","Yes!"],
   ["praise_2","“You found it!”","","You found it!"],
   ["praise_3","“Great job!”","","Great job!"],
@@ -741,7 +772,8 @@ const BANNER_ICON = {
   mem:`<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="4" width="8" height="10" rx="2"/><rect x="13" y="10" width="8" height="10" rx="2" opacity=".6"/></svg>`,
   clear:`<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2" opacity=".35"/><rect x="3" y="13" width="8" height="8" rx="2" opacity=".35"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>`,
   word:`<svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="7" width="6" height="10" rx="1.5"/><rect x="9" y="7" width="6" height="10" rx="1.5" opacity=".8"/><rect x="16" y="7" width="6" height="10" rx="1.5" opacity=".6"/></svg>`,
-  name:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17l-6.1 3.4 1.5-6.8L2.2 9l6.9-.7z"/></svg>`
+  name:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17l-6.1 3.4 1.5-6.8L2.2 9l6.9-.7z"/></svg>`,
+  mega:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 4.2v15.6a.8.8 0 0 1-1.2.7L12 17H9.4l1 3.3a1 1 0 0 1-1 1.3H7.6a1 1 0 0 1-.9-.7L5.3 17H4.5A2.5 2.5 0 0 1 2 14.5v-5A2.5 2.5 0 0 1 4.5 7H12l5.8-3.5a.8.8 0 0 1 1.2.7z"/></svg>`
 };
 function bannerFor(a){
   const s = a.by === "sound";
@@ -750,6 +782,7 @@ function bannerFor(a){
     case "memory": return s ? ["Memory: sounds", "--purple", "mem"] : ["Memory: letters", "--blue", "mem"];
     case "clear":  return s ? ["Clear the board: sounds", "--pink", "clear"] : ["Clear the board: letters", "--teal", "clear"];
     case "words":  return ["Spell a word", "--green", "word"];
+    case "match":  return ["Match the Sound", "--indigo", "mega"];
     default:       return ["Spell my name", "--orange", "name"];
   }
 }
@@ -762,7 +795,9 @@ function layoutCards(){
   const W = grid.clientWidth, H = grid.clientHeight, gap = Math.max(12, Math.min(24, W * .025)), CAP = 230 / .94;
   let best = 60, bestScore = 0, bestCols = n;
   const sq = Math.sqrt(n), square = n > 3 && Number.isInteger(sq);    // 2×2, 3×3, 4×4 stay square
-  for (let cols = square ? sq : 1; cols <= (square ? sq : n); cols++) {
+  const fixed = +grid.dataset.cols || 0;                               // megaphones stay in one row
+  const lo = fixed || (square ? sq : 1), hi = fixed || (square ? sq : n);
+  for (let cols = lo; cols <= hi; cols++) {
     const rows = Math.ceil(n / cols);
     const s = Math.min(CAP, (W - gap * (cols - 1)) / cols, (H - gap * (rows - 1)) / rows / 1.15);
     const score = s * (n % cols === 0 ? 1 : .88) * (1 - rows * .01);   // prefer full, even rows
@@ -778,7 +813,7 @@ function layoutSlots(){
 window.addEventListener("resize", () => { layoutCards(); layoutSlots(); });
 
 function renderCards(units, {down = false, upper = false} = {}){
-  const cols = shuffle(PALETTE);
+  const cols = shuffle(PALETTE); delete $("#grid").dataset.cols;
   $("#grid").innerHTML = units.map((u, i) =>
     `<button class="card${down ? " down" : ""}" data-u="${u}" aria-label="${down ? "hidden card" : disp(u, upper)}" style="--c:var(${cols[i % cols.length]})">
        <span class="inner"><span class="face front${u.length > 1 ? " di" : ""}"><span>${disp(u, upper)}</span></span><span class="face back"></span></span>
@@ -897,6 +932,14 @@ async function nextRound(){
     G.busy = true; await say(["spell", "child_" + P.slug]); if (!alive()) return;
     nextSpellStep();
   }
+  else if (act.game === "match") {
+    // one letter, a row of megaphones; drag the one whose sound goes with the letter
+    G.by = "sound";
+    const {active, pool} = soundPools(n);
+    G.target = pickSound(active.filter(u => u.length === 1));
+    renderMatch(G.target, shuffle([G.target, ...soundDistractors(G.target, n - 1, pool)]));
+    ask(["goes_with", "name_" + G.target]);
+  }
   else if (act.game === "words") {
     const opts = WORDS.filter(w => !G.recentWords.includes(w[0]));
     G.word = rand(opts.length ? opts : WORDS); G.recentWords.push(G.word[0]); if (G.recentWords.length > 5) G.recentWords.shift();
@@ -917,7 +960,103 @@ function nextSpellStep(){
   ask(askFor(u, G.by));
 }
 
+/* ================= match the sound ================= */
+// sounds easy to mix up by ear never share a board with the target (and are avoided between distractors)
+const SOUND_CONFUSE = [["c","k","q","x"],["b","d","p"],["m","n"],["f","v","th"],["s","z","sh"],["ch","j"],["i","e"],["o","u"]];
+const soundClash = (a, b) => a === b || SOUND_CONFUSE.some(g => g.includes(a) && g.includes(b));
+function soundDistractors(t, n, pool){
+  const cand = shuffle(pool.filter(u => !soundClash(u, t))), out = [];
+  for (const u of cand) { if (out.length >= n) break; if (!out.some(o => soundClash(o, u))) out.push(u); }
+  for (const u of cand) { if (out.length >= n) break; if (!out.includes(u)) out.push(u); }
+  for (const u of shuffle(TEACH_ORDER)) { if (out.length >= n) break; if (!out.includes(u) && !soundClash(u, t)) out.push(u); }
+  return out;
+}
+const MEGA_PAL = [["#E5483F","#FF9C8F","#A8302A"],["#2E78D0","#8DBDF5","#1B528F"],["#1F9A5E","#7FD9A8","#146B40"],["#8657D3","#C3A6F5","#5E3A9E"],["#EA6C1F","#FFB57A","#A94B10"]];
+const MEGA_SVG = `<svg class="mg" viewBox="0 0 64 64" aria-hidden="true"><path d="M21 40l4 15a2 2 0 0 0 2 1.5h5a1.5 1.5 0 0 0 1.4-2L30 42z" fill="var(--m3)"/><rect x="5" y="25" width="12" height="16" rx="4" fill="var(--m3)"/><path d="M15 24 46 10.5c2.6-1.1 4 .3 4 2.6v39.8c0 2.3-1.4 3.7-4 2.6L15 42z" fill="var(--m1)"/><path d="M27 18.8 34 15.7v34.6l-7-3.1z" fill="var(--m2)"/><ellipse cx="50" cy="33" rx="6" ry="22" fill="var(--m2)"/><ellipse cx="50.5" cy="33" rx="3.2" ry="17" fill="var(--m3)"/><path d="M19 27.5 40 18.6" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".55"/></svg>`;
+const WAVES_SVG = `<svg class="wv" viewBox="0 0 20 30" fill="none" stroke="var(--m1)" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M3 10a6 6 0 0 1 0 10"/><path d="M9 5a13 13 0 0 1 0 20"/><path d="M15 1a19 19 0 0 1 0 28"/></svg>`;
+const BADGE_SVG = `<span class="mbadge"><svg class="tp" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span>`;
+const megaVars = el => ["--m1","--m2","--m3"].map(v => `${v}:${el.style.getPropertyValue(v)}`).join(";");
+function renderMatch(t, units){
+  const pal = shuffle(MEGA_PAL), grid = $("#grid");
+  $("#target").innerHTML = `<div class="mdrop" id="mdrop"><div class="mletter${t.length > 1 ? " di" : ""}" style="--c:var(${rand(PALETTE)})"><span>${disp(t)}</span></div></div>`;
+  grid.dataset.cols = units.length;
+  grid.innerHTML = units.map((u, i) => { const [a, b, c] = pal[i % pal.length];
+    return `<button class="card mega" data-u="${u}" aria-label="Play a sound" style="--m1:${a};--m2:${b};--m3:${c}"><span class="mface">${MEGA_SVG}${WAVES_SVG}${BADGE_SVG}</span></button>`; }).join("");
+  requestAnimationFrame(layoutCards);
+}
+// dropping anywhere on the top half of the screen, or near the letter, counts
+function inDrop(x, y){
+  const d = $("#mdrop"); if (!d) return false;
+  const r = d.getBoundingClientRect();
+  return y < window.innerHeight * .5 || (x > r.left - 30 && x < r.right + 30 && y > r.top - 30 && y < r.bottom + 30);
+}
+async function playMega(el){
+  if (G.busy || G.hearing) return;
+  clearRepeat(); G.repeats = 0;
+  const step = G.step, sess = G.session;
+  document.querySelectorAll("#grid .mega.playing").forEach(m => m.classList.remove("playing"));
+  el.classList.add("playing", "heard"); el.setAttribute("aria-label", "Sound, heard");
+  await say(["snd_" + el.dataset.u]);
+  el.classList.remove("playing");
+  if (G.step === step && G.session === sess && !G.busy && !G.hearing) { G.readyAt = performance.now(); armRepeat(); }
+}
+function springBack(el){
+  el.style.transition = "transform .25s ease-out"; el.style.transform = "";
+  setTimeout(() => { el.style.transition = ""; }, 260);
+}
+let drag = null;
+$("#grid").addEventListener("pointerdown", e => {
+  const el = e.target.closest(".card.mega"); if (!el || drag || G.busy || G.hearing) return;
+  ensureAudio(); e.preventDefault();
+  drag = {el, id:e.pointerId, x:e.clientX, y:e.clientY, moved:false};
+  try { el.setPointerCapture(e.pointerId); } catch(err) {}
+});
+$("#grid").addEventListener("pointermove", e => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if (!drag.moved && Math.hypot(dx, dy) < 12) return;
+  if (!drag.el.classList.contains("heard") || G.busy) return;      // play before drag
+  drag.moved = true; drag.el.classList.add("dragging");
+  drag.el.style.transform = `translate(${dx}px,${dy}px)`;
+  const d = $("#mdrop"); if (d) d.classList.toggle("hot", inDrop(e.clientX, e.clientY));
+});
+function endDrag(e, cancel){
+  if (!drag || e.pointerId !== drag.id) return;
+  const {el, moved} = drag; drag = null;
+  const d = $("#mdrop"); if (d) d.classList.remove("hot");
+  el.classList.remove("dragging");
+  if (!moved) { if (!cancel) playMega(el); return; }                 // a tap plays the sound
+  if (!cancel && !G.busy && inDrop(e.clientX, e.clientY)) return dropMega(el);
+  springBack(el); if (!cancel) playMega(el);                          // a short drag replays it
+}
+$("#grid").addEventListener("pointerup", e => endDrag(e, false));
+$("#grid").addEventListener("pointercancel", e => endDrag(e, true));
+function dropMega(el){
+  clearRepeat(); G.repeats = 0;
+  if (el.dataset.u === G.target) return matchCorrect(el);
+  springBack(el); wrong(el, el.dataset.u);
+}
+async function matchCorrect(el){
+  G.busy = true; logStep();
+  const sess = G.session, alive = () => G.session === sess, first = G.misses === 0;
+  const L = $("#mdrop .mletter"), lr = L.getBoundingClientRect(), er = el.getBoundingClientRect();
+  const m = /translate\(([-\d.]+)px, ?([-\d.]+)px\)/.exec(el.style.transform) || [0, 0, 0];
+  const tx = +m[1] + lr.left + lr.width / 2 - (er.left + er.width / 2), ty = +m[2] + lr.top + lr.height / 2 - (er.top + er.height / 2);
+  el.classList.remove("hint");
+  el.style.transition = "transform .35s ease-in, opacity .35s ease-in";
+  el.style.transform = `translate(${tx}px,${ty}px) scale(.3)`; el.style.opacity = "0";
+  SFX.right();
+  await wait(340); if (!alive()) return;
+  L.insertAdjacentHTML("beforeend", `<span class="tuck" style="${megaVars(el)}">${MEGA_SVG}</span>`);
+  L.classList.remove("win"); void L.offsetWidth; L.classList.add("win");
+  document.querySelectorAll("#grid .mega").forEach(c => { if (c !== el) c.classList.add("dim"); });
+  await say([150, "name_" + G.target, "says", "snd_" + G.target, 120, ...praise(first)]);   // "B says buh"
+  if (!alive()) return;
+  endRound(alive);
+}
+
 $("#grid").addEventListener("click", e => {
+  if (G.act && G.act.game === "match") return;                       // megaphones use the drag handlers above
   const card = e.target.closest(".card"); if (!card || G.busy || G.hearing) return;   // wait for the question to finish
   ensureAudio(); clearRepeat(); G.repeats = 0;
   if (card.dataset.u === G.target) correct(card); else wrong(card, card.dataset.u);
