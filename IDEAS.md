@@ -40,3 +40,9 @@ light up as it blends again. It only turns on once 6 of its 22 words have all th
 and the recording panel lists which sounds unlock the most words.
 
 Still to do: the "m… op" (onset + rest) stage, which would need about 15 recorded word endings.
+
+## Find the partner (upper ↔ lowercase matching): deferred
+
+Match a capital to its lowercase partner (B ↔ b), around level 6 when lowercase first appears.
+Automatic letter case is built: capitals to level 5, capital-shaped lowercase letters mixing in from 6,
+all letters from 8, mirror letters (b d p q, m w, n u h) allowed together from 10; spelling in lowercase from 6.

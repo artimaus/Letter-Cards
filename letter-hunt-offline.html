@@ -465,6 +465,7 @@ const baseOf = u => u.replace("+", "");
 const soundClip = u => SOUND_ALIAS[u] || "snd_" + u;
 const WORDS = [["cat","🐱"],["dog","🐶"],["sun","☀️"],["pig","🐷"],["bus","🚌"],["fox","🦊"],["hat","🎩"],["bed","🛏️"],["hen","🐔"],["cup","🥤"],["bug","🐛"],["map","🗺️"]];
 const CONFUSE = [["b","d","p","q"],["m","w"],["n","u","h"],["i","l","j"],["c","o"],["e","f"],["v","y"],["s","z"],["sh","ch","th"],
+  ["g","q"],["f","t"],["c","e"],
   ["a","a+"],["e","e+","ee"],["i","i+"],["o","o+","oo"],["u","u+"],["c","k","ck"],["q","qu"],["w","wh"],["n","ng"]];
 const PALETTE = ["--red","--blue","--green","--purple","--orange","--yellow"];
 
@@ -562,7 +563,7 @@ const nameLetters = n => plain(n).replace(/[^a-z]/gi, "");
 const slug = n => nameLetters(n).toLowerCase();
 const oldSlug = n => (n || "").toLowerCase().replace(/[^a-z]/g, "");               // before accents were kept
 function newProfile(name = ""){
-  return {id:"p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name, level:1, style:"upper", known:[], stats:{}, recent:[], guessy:[], boxes:{}, album:[], rounds:0};
+  return {id:"p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name, level:1, style:"auto", known:[], stats:{}, recent:[], guessy:[], boxes:{}, album:[], rounds:0};
 }
 function fixStats(st){ const o = {}; for (const [k, v] of Object.entries(st || {})) o[k] = Array.isArray(v) ? {n:v[0], f:v[1], r:[]} : v; return o; }
 let state = null;
@@ -576,6 +577,7 @@ if (!state) {
 state.profiles.forEach(p => { p.stats = fixStats(p.stats); p.recent = p.recent || []; p.guessy = p.guessy || []; p.boxes = p.boxes || {}; p.album = p.album || []; p.known = p.known || []; p.slug = slug(p.name); });
 if (state.setSize == null) state.setSize = 4;
 if (state.breakAfter == null) state.breakAfter = 3;
+if (!state.caseVersion) { state.profiles.forEach(p => { if (p.style !== "lower") p.style = "auto"; }); state.caseVersion = 1; }
 if ((state.levelsVersion || 1) < LEVELS_VERSION) { state.profiles.forEach(migrateLevel); state.levelsVersion = LEVELS_VERSION; }
 if (state.fullscreen == null) state.fullscreen = true;
 const save = () => { try { localStorage.setItem(SKEY, JSON.stringify(state)); } catch(e) {} };
@@ -844,18 +846,46 @@ function exitFS(){
 /* ================= screens / home ================= */
 function show(id){ document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === id)); }
 let P = state.profiles[0];                       // profile being played
-const disp = (u, upper) => (upper || P.style === "upper") ? u.toUpperCase() : u;
+const disp = (u, upper) => (upper || P.style !== "lower") ? u.toUpperCase() : u;
+/* Letter case by level ("auto"): all capitals at first; from level 6 lowercase mixes in, starting with the
+   letters shaped like their capital; from 8 all letters; from 10 the mirror letters (b d p q, m w, n u h)
+   may share a board. A board never shows two cases of one letter (each letter appears once per board). */
+const LOWER_START = 6, LOWER_ALL = 8, MIRRORS_OK = 10;
+const SAME_SHAPE = ["c","o","s","u","v","w","x","z","k","p","y"];
+const MIRROR_GROUPS = [["b","d","p","q"],["m","w"],["n","u","h"]];
+const caseStyle = (p = P) => p.style === "upper" || p.style === "lower" ? p.style : "auto";
+const lowerShare = () => P.level >= MIRRORS_OK ? .6 : P.level >= LOWER_ALL ? .45 : P.level >= LOWER_START ? .3 : 0;
+function lowerOK(u){
+  const st = caseStyle(); if (st !== "auto") return st === "lower";
+  if (P.level < LOWER_START) return false;
+  return P.level >= LOWER_ALL || (baseOf(u).length === 1 && SAME_SHAPE.includes(baseOf(u)));
+}
+const pickCase = u => { const st = caseStyle(); return st !== "auto" ? st : lowerOK(u) && Math.random() < lowerShare() ? "lower" : "upper"; };
+/* Cases for one board. Big boards can't always keep look-alike letters apart, so the case does it:
+   below level 10 only one letter of each mirror group (b d p q / m w / n u h) may be lowercase,
+   and a capital I never sits next to a lowercase l. */
+function boardCases(units, cas){
+  const c = Object.fromEntries(units.map(u => [u, cas || pickCase(u)]));
+  if (cas) return c;
+  if (!(caseStyle() === "auto" && P.level >= MIRRORS_OK))
+    MIRROR_GROUPS.forEach(g => units.filter(u => g.includes(u) && c[u] === "lower").slice(1).forEach(u => c[u] = "upper"));
+  if (c.i === "upper" && c.l === "lower") c.l = "upper";
+  return c;
+}
+/* words (spelling, robot tiles) are never mixed: capitals early, then lowercase like in books */
+const wordCase = (p = P) => { const st = caseStyle(p); return st !== "auto" ? st : p.level >= LOWER_START ? "lower" : "upper"; };
 const CROWN_SVG = `<svg class="crown" viewBox="0 0 24 14" aria-hidden="true"><path d="M2 12.5 3.6 3l5 4.6L12 1l3.4 6.6L20.4 3 22 12.5z" fill="#F2B233" stroke="#B97F06" stroke-width="1.3" stroke-linejoin="round"/></svg>`;
 /* One way to draw a sound unit: the letter(s), with a crown on a long vowel. style: "upper"/"lower" or the player's. */
 function unitHTML(u, style){
-  const b = baseOf(u), t = (style || P.style) === "upper" ? b.toUpperCase() : b;
+  const lower = style === "lower" || (!style && P.style === "lower");
+  const b = baseOf(u), t = lower ? b : b.toUpperCase();
   return isLong(u) ? `<span class="crowned">${CROWN_SVG}${t}</span>` : t;
 }
 const unitLabel = u => isLong(u) ? `${baseOf(u)} that says its name` : u;
 const PLAY_SVG = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>`;
 function nameTiles(p){
   return nameLetters(p.name).split("").map((l, i) =>
-    `<span style="--c:var(${PALETTE[i % PALETTE.length]})">${i ? (p.style === "upper" ? l.toUpperCase() : l.toLowerCase()) : l.toUpperCase()}</span>`).join("");
+    `<span style="--c:var(${PALETTE[i % PALETTE.length]})">${i ? (wordCase(p) === "upper" ? l.toUpperCase() : l.toLowerCase()) : l.toUpperCase()}</span>`).join("");
 }
 function renderHome(){
   $("#profiles").innerHTML = state.profiles.map((p, i) => {
@@ -898,7 +928,10 @@ const G = {session:0, act:null, practice:null, tryLevel:null, done:0, busy:true,
   steps:0, firstSteps:0, prompt:[], recent:[], recentWords:[], lastLine:null, seq:null, idx:0, word:null, unlockRound:false,
   step:0, misses:0, rapid:0, readyAt:0, repeatTimer:null, repeats:0, seenS:{}, unit:null, paired:new Set(), promptOpts:null,
   offered:false, choosing:null, setsPlayed:0, locked:false};
-const confGroup = u => [...new Set([u, ...CONFUSE.filter(g => g.includes(u)).flat()])];
+const confGroup = u => {                                               // mirror letters may meet at high levels
+  const mirrorsOK = caseStyle() === "auto" && P.level >= MIRRORS_OK;
+  return [...new Set([u, ...CONFUSE.filter(g => g.includes(u) && !(mirrorsOK && MIRROR_GROUPS.includes(g))).flat()])];
+};
 const knows = u => P.known.includes(u);
 
 function levelActs(level){ return ACTS.filter(a => a.min <= level && level <= a.max); }
@@ -1035,17 +1068,18 @@ function layoutSlots(){
 }
 window.addEventListener("resize", () => { layoutCards(); layoutSlots(); });
 
-function renderCards(units, {down = false, upper = false} = {}){
+function renderCards(units, {down = false, cas = null} = {}){
   const cols = shuffle(PALETTE); resetGrid();
+  G.cases = boardCases(units, cas);
   $("#grid").innerHTML = units.map((u, i) =>
-    `<button class="card${down ? " down" : ""}" data-u="${u}" aria-label="${down ? "hidden card" : unitLabel(u)}" style="--c:var(${cols[i % cols.length]})">
-       <span class="inner"><span class="face front${baseOf(u).length > 1 ? " di" : ""}"><span>${unitHTML(u, upper ? "upper" : null)}</span></span><span class="face back"></span></span>
+    `<button class="card${down ? " down" : ""}" data-u="${u}" data-case="${G.cases[u]}" aria-label="${down ? "hidden card" : unitLabel(u)}" style="--c:var(${cols[i % cols.length]})">
+       <span class="inner"><span class="face front${baseOf(u).length > 1 ? " di" : ""}"><span>${unitHTML(u, G.cases[u])}</span></span><span class="face back"></span></span>
      </button>`).join("");
   requestAnimationFrame(layoutCards);
 }
 function renderSlots(seq, {pic = null, hint = true, firstUpper = false} = {}){
   $("#target").innerHTML = (pic ? `<div class="pic" id="pic">${pic}</div>` : "") +
-    `<div class="slots">${seq.map((u, i) => `<div class="slot${hint ? "" : " blank"}${i === 0 ? " next" : ""}" data-i="${i}">${disp(u, firstUpper && i === 0)}</div>`).join("")}</div>`;
+    `<div class="slots">${seq.map((u, i) => `<div class="slot${hint ? "" : " blank"}${i === 0 ? " next" : ""}" data-i="${i}">${unitHTML(u, firstUpper && i === 0 ? "upper" : wordCase())}</div>`).join("")}</div>`;
   layoutSlots();
 }
 const ROBOT_SVG = `<svg class="rb" viewBox="0 0 120 110" aria-hidden="true"><rect x="57" y="4" width="6" height="14" rx="3" fill="#4E6E91"/><circle cx="60" cy="6" r="6" fill="#E5483F"/>
@@ -1260,8 +1294,8 @@ function nextSpellStep(){
   const act = G.act, u = G.seq[G.idx];
   G.target = u; G.busy = false; newStep();
   G.by = (act.game === "words" && act.by === "sound" && knows(u)) ? "sound" : "name";
-  const upper = act.game === "name" && G.idx === 0;
-  renderCards(shuffle([u, ...distractors([u], act.cards - 1, LETTERS)]), {upper});
+  const cas = act.game === "name" && G.idx === 0 ? "upper" : wordCase();   // names start with a capital
+  renderCards(shuffle([u, ...distractors([u], act.cards - 1, LETTERS)]), {cas});
   markNextSlot();
   ask(askFor(u, G.by));
 }
@@ -1285,7 +1319,7 @@ const BADGE_SVG = `<span class="mbadge"><svg class="tp" viewBox="0 0 24 24" fill
 const megaVars = el => ["--m1","--m2","--m3"].map(v => `${v}:${el.style.getPropertyValue(v)}`).join(";");
 function renderMatch(t, units){
   const pal = shuffle(MEGA_PAL), grid = $("#grid");
-  $("#target").innerHTML = `<div class="mdrop" id="mdrop"><div class="mletter${baseOf(t).length > 1 ? " di" : ""}" style="--c:var(${rand(PALETTE)})"><span>${unitHTML(t)}</span></div></div>`;
+  $("#target").innerHTML = `<div class="mdrop" id="mdrop"><div class="mletter${baseOf(t).length > 1 ? " di" : ""}" style="--c:var(${rand(PALETTE)})"><span>${unitHTML(t, pickCase(t))}</span></div></div>`;
   resetGrid(); grid.dataset.cols = units.length;
   grid.innerHTML = units.map((u, i) => { const [a, b, c] = pal[i % pal.length];
     return `<button class="card mega" data-u="${u}" aria-label="Play a sound" style="--m1:${a};--m2:${b};--m3:${c}"><span class="mface">${MEGA_SVG}${WAVES_SVG}${BADGE_SVG}</span></button>`; }).join("");
@@ -1408,7 +1442,8 @@ function logStep(){
   G.steps++; if (G.stepFirst) G.firstSteps++;
   if (G.practice) return;
   const robot = G.act && G.act.game === "robot";                       // blending progress is kept per word
-  const u = G.unit || G.target, k = robot ? "w:" + u : (G.by === "sound" ? "s:" : "l:") + u;
+  const u = G.unit || G.target, lower = G.by === "name" && (G.cases || {})[u] === "lower";
+  const k = robot ? "w:" + u : G.by === "sound" ? "s:" + u : (lower ? "ll:" : "l:") + u;
   reviewBox(k, G.stepFirst);
   const s = P.stats[k] || {n:0, f:0, r:[]};
   s.n++; if (G.stepFirst) s.f++; s.r.push(G.stepFirst ? 1 : 0); if (s.r.length > 6) s.r.shift();
@@ -1484,7 +1519,7 @@ async function correct(card){
   document.querySelectorAll("#grid .card").forEach(c => { if (c !== card) c.classList.add("dim"); });
   if (act.game === "robot") {                  // letter tiles light up as the robot blends again, then the word
     const keys = G.robot.s.map(soundClip);
-    card.querySelector(".front").insertAdjacentHTML("beforeend", `<span class="rtiles">${G.robot.s.map(u => `<span>${unitHTML(u)}</span>`).join("")}</span>`);
+    card.querySelector(".front").insertAdjacentHTML("beforeend", `<span class="rtiles">${G.robot.s.map(u => `<span>${unitHTML(u, wordCase())}</span>`).join("")}</span>`);
     const tiles = [...card.querySelectorAll(".rtiles span")];
     await say([250, ...keys], {gap:140, onStep:(i, key) => { const j = keys.indexOf(key); tiles.forEach((t, x) => t.classList.toggle("on", x <= j)); robotLight(j); }});
     if (!alive()) return;
@@ -1494,7 +1529,7 @@ async function correct(card){
     return endRound(alive);
   }
   if (act.game === "ispy") {                   // "Moon starts with /m/. M says /m/."
-    card.querySelector(".front").insertAdjacentHTML("beforeend", `<span class="plet">${unitHTML(G.unit)}</span>`);
+    card.querySelector(".front").insertAdjacentHTML("beforeend", `<span class="plet">${unitHTML(G.unit, pickCase(G.unit))}</span>`);
     await say([200, picClip(G.target), "starts_with", soundClip(G.unit), 300, ...pairClips(G.unit), 120, ...praise(first)]);
     if (!alive()) return;
     return endRound(alive);
@@ -1558,7 +1593,7 @@ function party(kind){
     SFX.levelup(); setTimeout(() => say(pickPraise(["level_up"])), 700);
   } else if (kind === "unlock") {
     const letters = nameLetters(P.name).split("");
-    $("#partyArt").innerHTML = `<div class="nametiles big" aria-label="${esc(P.name)}">${letters.map((l, i) => `<span style="--c:var(${PALETTE[i % PALETTE.length]})">${i ? disp(l.toLowerCase()) : l.toUpperCase()}</span>`).join("")}</div>`;
+    $("#partyArt").innerHTML = `<div class="nametiles big" aria-label="${esc(P.name)}">${letters.map((l, i) => `<span style="--c:var(${PALETTE[i % PALETTE.length]})">${i ? (wordCase() === "upper" ? l.toUpperCase() : l.toLowerCase()) : l.toUpperCase()}</span>`).join("")}</div>`;
     SFX.levelup(); setTimeout(() => say([...pickPraise(["you_did_it"]), 200, "child_" + P.slug]), 700);
   } else {
     // letters whose sound reached the collection's "awake" box since the last celebration
@@ -1742,13 +1777,13 @@ async function backup(){
   const clips = {}; for (const [k, b] of clipBlobs) clips[k] = await blobToB64(b);
   const profiles = state.profiles.map(({slug, ...p}) => p);
   if (!downloads) {
-    const data = JSON.stringify({app:"letter-hunt", version:3, profiles, clips});
+    const data = JSON.stringify({app:"letter-hunt", version:4, profiles, clips});
     const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], {type:"application/json"}));
     a.download = "letter-hunt-backup.json"; document.body.appendChild(a); a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
     status("Backup saved to your downloads."); return;
   }
-  try { await downloads.save({filename:"letter-hunt-backup.json", data:JSON.stringify({app:"letter-hunt", version:3, profiles, clips})}); status("Backup saved."); }
+  try { await downloads.save({filename:"letter-hunt-backup.json", data:JSON.stringify({app:"letter-hunt", version:4, profiles, clips})}); status("Backup saved."); }
   catch(e) { if (!e || e.code !== "declined") status("The backup couldn’t be saved here."); }
 }
 $("#fileBackup").addEventListener("change", async e => {
@@ -1758,6 +1793,7 @@ $("#fileBackup").addEventListener("change", async e => {
     if (Array.isArray(j.profiles) && j.profiles.length) {
       state.profiles = j.profiles.map(p => Object.assign(newProfile(), p, {stats:fixStats(p.stats), slug:slug(p.name)}));
       if ((j.version || 2) < 3) state.profiles.forEach(migrateLevel);   // backup from before the 12-level table
+      if ((j.version || 2) < 4) state.profiles.forEach(p => { if (p.style !== "lower") p.style = "auto"; });   // before automatic letter case
       state.editId = state.profiles[0].id; save(); buildClips();
     }
     let n = 0;
@@ -1805,10 +1841,10 @@ function renderRecCounts(){
   if (el) el.textContent = `${keys.filter(hasClip).length} of ${keys.length} recorded`;
   const b = $("#backupBtn"); if (b) b.hidden = !canBackup();
 }
-function progressTiles(E, prefix, units){
+function progressTiles(E, prefix, units, cas){
   return `<div class="prog">${units.map(u => { const s = E.stats[prefix + u];
     let cls = ""; if (s && s.n >= 2) { const r = s.f / s.n; cls = r >= .8 ? "g" : r >= .5 ? "y" : "r"; }
-    const t = unitHTML(u, E.style);
+    const t = unitHTML(u, cas || (caseStyle(E) === "lower" ? "lower" : "upper"));
     const b = (E.boxes || {})[prefix + u];
     return `<div class="pt ${cls}" title="${s ? `${s.f} of ${s.n} on the first try` : "not played yet"}${b ? ` · review box ${b.box}` : ""}">${t}${s ? `<small>${s.f}/${s.n}</small>` : ""}${b ? `<i class="bx">${b.box}</i>` : ""}</div>`; }).join("")}</div>`;
 }
@@ -1832,7 +1868,7 @@ function renderParent(){
     <h2>Players</h2>
     <div class="ptabs">${seg("editId", state.profiles.map(p => [p.id, esc(p.name || "Unnamed")]), E.id)}<button class="btn" id="addProf">Add player</button></div>
     <div class="row" style="margin-top:8px"><label for="nameIn">Name</label><input type="text" id="nameIn" value="${esc(E.name)}" autocomplete="off" spellcheck="false" placeholder="e.g. Leo"></div>
-    <div class="row"><span>Letter style</span>${seg("style", [["upper","ABC"],["lower","abc"]], E.style)}</div>
+    <div class="row"><span>Letter case<span class="small" style="display:block">Automatic: capitals first; lowercase mixes in from level ${LOWER_START} (letters shaped like their capital first), all letters from ${LOWER_ALL}. Spelling uses lowercase from level ${LOWER_START}.</span></span>${seg("style", [["auto","Automatic"],["upper","ABC"],["lower","abc"]], caseStyle(E))}</div>
     <div class="row"><span>Level</span>${stepper("level", E.level, 1, MAX_LEVEL)}</div>
     <div style="padding:4px 0 6px">
       ${E.level >= MAX_LEVEL ? `<p class="small">Top level.</p>` : `
@@ -1853,15 +1889,16 @@ function renderParent(){
   <div class="sec">
     <h2>Sounds ${esc(who)} knows</h2>
     <p class="note">Sound games mostly ask about these and mix in the next two on the list. A sound is marked known automatically after it’s found on the first try 5 of the last 6 times. Tap to change any of them.</p>
-    <div class="chips">${TEACH_ORDER.map(u => `<button type="button" class="chip" data-u="${u}" aria-pressed="${E.known.includes(u)}">${unitHTML(u, E.style)}</button>`).join("")}</div>
+    <div class="chips">${TEACH_ORDER.map(u => `<button type="button" class="chip" data-u="${u}" aria-pressed="${E.known.includes(u)}">${unitHTML(u, caseStyle(E) === "lower" ? "lower" : "upper")}</button>`).join("")}</div>
     <h3 style="font:600 15px system-ui;margin:14px 0 6px;color:var(--muted)">More sounds (level ${ADV_LEVEL}+): a crown means the letter says its name</h3>
-    <div class="chips">${ADVANCED.map(u => `<button type="button" class="chip" data-u="${u}" aria-pressed="${E.known.includes(u)}">${unitHTML(u, E.style)}</button>`).join("")}</div>
+    <div class="chips">${ADVANCED.map(u => `<button type="button" class="chip" data-u="${u}" aria-pressed="${E.known.includes(u)}">${unitHTML(u, caseStyle(E) === "lower" ? "lower" : "upper")}</button>`).join("")}</div>
   </div>
 
   <div class="sec">
     <h2>How ${esc(who)} is doing</h2>
     <p class="note">First-try finds out of total finds. Green is 80% or more, yellow 50–79%, red below 50%. The small number is the review box (0–5): a letter found first try on its review day moves up a box and comes back later (next day, 2, 4, 10, then 21 days); a miss sends it back to box 1. A sound “wakes up” in ${esc(who)}’s letter collection at box ${AWAKE_BOX}.</p>
-    <h3 style="font:600 15px system-ui;margin:10px 0 6px;color:var(--muted)">Letters</h3>${progressTiles(E, "l:", LETTERS)}
+    <h3 style="font:600 15px system-ui;margin:10px 0 6px;color:var(--muted)">Letters</h3>${progressTiles(E, "l:", LETTERS, "upper")}
+    <h3 style="font:600 15px system-ui;margin:16px 0 6px;color:var(--muted)">Lowercase letters (from level ${LOWER_START})</h3>${progressTiles(E, "ll:", LETTERS, "lower")}
     <h3 style="font:600 15px system-ui;margin:16px 0 6px;color:var(--muted)">Sounds</h3>${progressTiles(E, "s:", TEACH_ORDER)}
     <h3 style="font:600 15px system-ui;margin:16px 0 6px;color:var(--muted)">More sounds (level ${ADV_LEVEL}+)</h3>${progressTiles(E, "s:", ADVANCED)}
     <div style="margin-top:14px"><button class="btn danger" id="resetStats">Clear progress and go back to level 1</button></div>
