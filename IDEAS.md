@@ -23,21 +23,26 @@ Mockup: https://claude.ai/artifact/YZZKQL9GHwqrBQba6C7PED
 - Levels: 3 megaphones at levels 9–10, 4 megaphones at levels 11–12.
 - Fallback if dragging is too fiddly: a grown-up setting for "tap a megaphone twice to choose".
 
-## Planning session needed: long vowels and less common sounds
+## More sounds, round 1: built
 
-Right now the game only uses short vowels (a as in apple) and one sound per letter, plus sh/ch/th.
-Plan how to bring in, at medium-to-higher levels:
-- Long vowels (a as in cake, "the letter says its name"), and how to present a letter with two sounds
-  without confusing the short-vowel work.
-- Less common sounds: soft c and g, "ck", "ng", "wh", "qu", voiced vs unvoiced "th", vowel teams.
-- Which games they appear in, how they're recorded, and how they show in the letter collection.
+From level 8: long vowels (shown with a crown: "A… says its name") plus ee, oo, ck, ng, qu, wh.
+Most reuse existing clips; only /ng/ and /oo/ are new recordings. Used in find the sound, memory sounds
+and clear the board. Look-alike and sound-alike units never share a board.
 
-## Robot Talk (oral blending): deferred
+Round 2, still to plan: soft c and g, voiced vs unvoiced th, vowel teams (ai/ay, oa, igh), r-controlled
+vowels (ar, or, er), long-vowel I Spy pictures, and the new sounds in Match the Sound.
 
-Designed but not built: a robot says a word in pieces ("m… op", "mmmaaap", "m-a-p") and the child
-picks the picture; letter tiles light up as it re-blends. Deferred because the natural-sounding stages
-need per-word recordings.
+## Robot Talk (oral blending): built
 
-Idea for recordings in general: keep most clips optional so the game works right away with the robot
-voice, but let some higher-level games require recordings (e.g. Robot Talk only unlocks once its word
-recordings exist). Quick setup for immediate play; more setup unlocks more.
+Level 4+. The robot says a word's sounds from the parent's recorded sound clips (smooth at levels 4-9,
+separated at 10-12) while its chest lights step along; the child picks the picture, and the letter tiles
+light up as it blends again. It only turns on once 6 of its 22 words have all their sounds recorded,
+and the recording panel lists which sounds unlock the most words.
+
+Still to do: the "m… op" (onset + rest) stage, which would need about 15 recorded word endings.
+
+## Find the partner (upper ↔ lowercase matching): deferred
+
+Match a capital to its lowercase partner (B ↔ b), around level 6 when lowercase first appears.
+Automatic letter case is built: capitals to level 5, capital-shaped lowercase letters mixing in from 6,
+all letters from 8, mirror letters (b d p q, m w, n u h) allowed together from 10; spelling in lowercase from 6.

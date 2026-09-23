@@ -13,7 +13,7 @@
 :root{
   --board:#C9EEDF; --board-dot:#B2E2CF; --ink:#1D2B4F; --muted:#56637F;
   --card:#FFFFFF; --edge:#D5DDEB; --back:#2E78D0; --back-dot:#4A8FE0;
-  --red:#E5483F; --yellow:#E9A20F; --green:#1F9A5E; --blue:#2E78D0; --purple:#8657D3; --orange:#EA6C1F; --teal:#168C99; --pink:#D13F7A; --indigo:#4F5BD5; --lime:#5F9A12;
+  --red:#E5483F; --yellow:#E9A20F; --green:#1F9A5E; --blue:#2E78D0; --purple:#8657D3; --orange:#EA6C1F; --teal:#168C99; --pink:#D13F7A; --indigo:#4F5BD5; --lime:#5F9A12; --steel:#4E6E91;
   --panel:#FFFFFF; --panel-2:#F2F6FB; --line:#DCE3EE; --ok:#1F9A5E;
   --letter:"Andika","Andika New Basic","Trebuchet MS",system-ui,sans-serif;
   --ui:"Fredoka","Andika",ui-rounded,"Trebuchet MS",system-ui,sans-serif;
@@ -290,6 +290,21 @@ button:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
 .meter i{display:block;height:100%;background:var(--ok);border-radius:5px}
 .small{font-size:13px;color:var(--muted);line-height:1.45}
 .ptabs{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+/* long vowels: a little crown means "says its name" */
+.crowned{position:relative;display:inline-block}
+.crowned .crown{position:absolute;left:50%;top:-.34em;width:.62em;height:auto;transform:translateX(-50%)}
+.albh{grid-column:1/-1;margin:14px 4px 0;font:600 18px/1.2 var(--ui);color:var(--muted);display:flex;align-items:center;gap:8px}
+.albh svg{width:26px;height:auto}
+/* robot talk */
+.robot{position:relative;border:0;background:none;padding:0;display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.robot svg.rb{width:clamp(96px,17vh,150px);height:auto}
+.lights{position:absolute;left:50%;top:79%;transform:translateX(-50%);display:flex;gap:5px}
+.lights i{width:clamp(10px,1.8vh,16px);aspect-ratio:1;border-radius:50%;background:#C7D3E0;box-shadow:inset 0 -2px 0 rgba(0,0,0,.15);transition:background .12s,transform .12s}
+.lights i.on{background:var(--yellow);transform:scale(1.25);box-shadow:0 0 12px var(--yellow)}
+.card .front .rtiles{position:absolute;left:50%;bottom:5%;transform:translateX(-50%);display:flex;gap:4px}
+.card .front .rtiles span{transform:none}
+.rtiles span{min-width:1.1em;padding:0 .12em;border-radius:.2em;background:#EEF2F7;color:#1D2B4F;font:700 calc(var(--cs,120px)*.2)/1.2 var(--letter);text-align:center;transition:background .12s}
+.rtiles span.on{background:var(--green);color:#fff}
 /* i spy pictures */
 .card.picc .front{font-size:calc(var(--cs,120px)*.56)}
 .card.picc .emo{line-height:1;transform:none}
@@ -434,11 +449,24 @@ const SOUNDS = {
   k:["/k/","kite","kuh"], l:["/l/","lamp","lll"], m:["/m/","moon","mmm"], n:["/n/","nest","nnn"], o:["/o/","octopus","aw"],
   p:["/p/","pig","puh"], q:["/kw/","queen","kwuh"], r:["/r/","red","rrr"], s:["/s/","sun","sss"], t:["/t/","top","tuh"],
   u:["/u/","up","uh"], v:["/v/","van","vvv"], w:["/w/","web","wuh"], x:["/ks/","the end of fox","ks"], y:["/y/","yes","yuh"],
-  z:["/z/","zip","zzz"], sh:["/sh/","ship","shh"], ch:["/ch/","chip","chuh"], th:["/th/","thumb","thh"]
+  z:["/z/","zip","zzz"], sh:["/sh/","ship","shh"], ch:["/ch/","chip","chuh"], th:["/th/","thumb","thh"],
+  ng:["/ng/","the end of ring","nng"], oo:["/oo/","moon","ooo"]
 };
 const TEACH_ORDER = ["s","a","t","p","i","n","m","d","g","o","c","k","e","u","r","h","b","f","l","j","v","w","x","y","z","q","sh","ch","th"];
+/* More sounds, from level 8. "a+" is long a (the letter says its name), shown with a crown.
+   Most reuse clips you already have: long vowels and ee use the letter-name clips, ck/qu/wh use sounds. */
+const ADV_LEVEL = 8;
+const ADVANCED = ["a+","e+","i+","o+","u+","ee","oo","ck","ng","qu","wh"];
+const ALL_SOUNDS = TEACH_ORDER.concat(ADVANCED);
+const SOUND_ALIAS = {"a+":"name_a", "e+":"name_e", "i+":"name_i", "o+":"name_o", "u+":"name_u", ee:"name_e", ck:"snd_k", qu:"snd_q", wh:"snd_w"};
+const RECORDED_SOUNDS = TEACH_ORDER.concat(["ng", "oo"]);          // units with their own sound clip
+const isLong = u => u.endsWith("+");
+const baseOf = u => u.replace("+", "");
+const soundClip = u => SOUND_ALIAS[u] || "snd_" + u;
 const WORDS = [["cat","🐱"],["dog","🐶"],["sun","☀️"],["pig","🐷"],["bus","🚌"],["fox","🦊"],["hat","🎩"],["bed","🛏️"],["hen","🐔"],["cup","🥤"],["bug","🐛"],["map","🗺️"]];
-const CONFUSE = [["b","d","p","q"],["m","w"],["n","u","h"],["i","l","j"],["c","o"],["e","f"],["v","y"],["s","z"],["sh","ch","th"]];
+const CONFUSE = [["b","d","p","q"],["m","w"],["n","u","h"],["i","l","j"],["c","o"],["e","f"],["v","y"],["s","z"],["sh","ch","th"],
+  ["g","q"],["f","t"],["c","e"],
+  ["a","a+"],["e","e+","ee"],["i","i+"],["o","o+","oo"],["u","u+"],["c","k","ck"],["q","qu"],["w","wh"],["n","ng"]];
 const PALETTE = ["--red","--blue","--green","--purple","--orange","--yellow"];
 
 /* ================= progression ================= */
@@ -452,7 +480,8 @@ const LINES = {
   memS:   {name:"Memory: sounds",   w:1},
   words:  {name:"Spell a word",     w:1},
   match:  {name:"Match the Sound",  w:1},
-  ispy:   {name:"I Spy",            w:1}
+  ispy:   {name:"I Spy",            w:1},
+  robot:  {name:"Robot Talk",       w:1}
 };
 const ACTS = [
   {id:"FL3",   line:"letters", game:"find",  by:"name",  cards:3,              min:1, max:1},
@@ -479,6 +508,10 @@ const ACTS = [
   {id:"W",     line:"words",   game:"words", by:"name",  hint:true,  cards:4,  min:5, max:7},
   {id:"WS",    line:"words",   game:"words", by:"sound", hint:true,  cards:4,  min:8, max:10},
   {id:"WX",    line:"words",   game:"words", by:"sound", hint:false, cards:6,  min:11, max:12},
+
+  {id:"RT2",   line:"robot",   game:"robot", by:"sound", cards:2, stretchy:true, gap:0, min:4, max:6},
+  {id:"RT3",   line:"robot",   game:"robot", by:"sound", cards:3, gap:0,             min:7, max:9},
+  {id:"RT3S",  line:"robot",   game:"robot", by:"sound", cards:3, gap:350,           min:10, max:12},
 
   {id:"IS2",   line:"ispy",    game:"ispy",  by:"sound", cards:2, stretchy:true, min:3, max:4},
   {id:"IS3",   line:"ispy",    game:"ispy",  by:"sound", cards:3,              min:5, max:8},
@@ -508,6 +541,7 @@ function actLabel(a){
     case "memory": return `Memory ${what} · ${gridName(a.cards)}`;
     case "clear":  return `Clear the board: ${what} · ${a.finds} finds, ${gridName(a.cards)}`;
     case "name":   return `Spell name · ${a.hint ? "guide letters" : "no guide"} · ${gridName(a.cards)}`;
+    case "robot":  return `Robot Talk · ${a.cards} pictures · ${a.gap ? "separate sounds" : "smooth sounds"}${a.stretchy ? " · stretchy starts" : ""}`;
     case "ispy":   return `I Spy · first sounds · ${a.cards} pictures${a.stretchy ? " · stretchy sounds only" : ""}`;
     case "match":  return `Match the Sound · ${a.cards} megaphones`;
     case "words":  return `Spell a word · by ${a.by === "sound" ? "sound" : "letter name"}${a.hint ? "" : " · no guide"} · ${gridName(a.cards)}`;
@@ -529,7 +563,7 @@ const nameLetters = n => plain(n).replace(/[^a-z]/gi, "");
 const slug = n => nameLetters(n).toLowerCase();
 const oldSlug = n => (n || "").toLowerCase().replace(/[^a-z]/g, "");               // before accents were kept
 function newProfile(name = ""){
-  return {id:"p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name, level:1, style:"upper", known:[], stats:{}, recent:[], guessy:[], boxes:{}, album:[], rounds:0};
+  return {id:"p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name, level:1, style:"auto", known:[], stats:{}, recent:[], guessy:[], boxes:{}, album:[], rounds:0};
 }
 function fixStats(st){ const o = {}; for (const [k, v] of Object.entries(st || {})) o[k] = Array.isArray(v) ? {n:v[0], f:v[1], r:[]} : v; return o; }
 let state = null;
@@ -543,6 +577,7 @@ if (!state) {
 state.profiles.forEach(p => { p.stats = fixStats(p.stats); p.recent = p.recent || []; p.guessy = p.guessy || []; p.boxes = p.boxes || {}; p.album = p.album || []; p.known = p.known || []; p.slug = slug(p.name); });
 if (state.setSize == null) state.setSize = 4;
 if (state.breakAfter == null) state.breakAfter = 3;
+if (!state.caseVersion) { state.profiles.forEach(p => { if (p.style !== "lower") p.style = "auto"; }); state.caseVersion = 1; }
 if ((state.levelsVersion || 1) < LEVELS_VERSION) { state.profiles.forEach(migrateLevel); state.levelsVersion = LEVELS_VERSION; }
 if (state.fullscreen == null) state.fullscreen = true;
 const save = () => { try { localStorage.setItem(SKEY, JSON.stringify(state)); } catch(e) {} };
@@ -557,6 +592,8 @@ const PHRASES = [
   ["look","“Look closely!”","Memory game, before the cards flip over.","Look closely!"],
   ["spell","“Let’s spell…”","Before a name or a word.","Let's spell"],
   ["goes_with","“Which sound goes with…”","Match the Sound: a letter name plays right after it.","Which sound goes with"],
+  ["says_its_name","“…says its name!”","After a long vowel: “A… says its name!”","says its name!"],
+  ["robot_says","“Robot says…”","Robot Talk: the robot’s sounds play right after it.","Robot says"],
   ["says","“…says…”","Between a letter name and its sound: “B says /b/”. Used in most games.","says"],
   ["ispy","“I spy something that starts with…”","I Spy: a letter sound plays right after it.","I spy something that starts with"],
   ["starts_with","“…starts with…”","I Spy: “Moon starts with mmm”.","starts with"],
@@ -594,7 +631,8 @@ const SOUND_TIPS = {
   v:["stretchy","Like f, with your voice buzzing: “vvvv”."], w:["quick","Round your lips, quick: “w”, as in web."],
   x:["quick","X says “ks”, as at the end of fox."], y:["quick","A quick “y”, as in yes."],
   z:["stretchy","Like s with a buzz, a busy bee: “zzzz”."], q:["quick","Q says “kw”, as in queen."],
-  sh:["stretchy","Finger to your lips: “shhhh”."], ch:["quick","A quick little sneeze: “ch”."], th:["stretchy","Tongue between your teeth, blow: “thhh”, as in thumb."]
+  sh:["stretchy","Finger to your lips: “shhhh”."], ch:["quick","A quick little sneeze: “ch”."], th:["stretchy","Tongue between your teeth, blow: “thhh”, as in thumb."],
+  ng:["stretchy","Back of the tongue up, hum through your nose: “ngng”, as at the end of ring."], oo:["stretchy","Round your lips, as in moon: “oooo”."]
 };
 /* I Spy pictures: [word, emoji, first sound]. No words that start with two consonants,
    no spellings that mislead (knife, phone), and no emoji with two likely names. */
@@ -627,16 +665,24 @@ const ISPY = [
 ].map(([w, e, s]) => ({w, e, s}));
 const ISPY_BY = {}; ISPY.forEach(x => (ISPY_BY[x.s] = ISPY_BY[x.s] || []).push(x));
 const STRETCHY_FIRST = ["m","s","f","n","l","r","v","z","sh"];         // easiest first sounds to hear
+/* Robot Talk words: [word, emoji, sounds]. Short, regular words with clear pictures. */
+const BLEND_WORDS = [
+  ["cat","🐱","c a t"],["dog","🐶","d o g"],["pig","🐷","p i g"],["bus","🚌","b u s"],["fox","🦊","f o x"],["hat","🎩","h a t"],
+  ["bed","🛏️","b e d"],["cup","🥤","c u p"],["bug","🐛","b u g"],["sun","☀️","s u n"],["van","🚐","v a n"],["web","🕸️","w e b"],
+  ["pen","🖊️","p e n"],["log","🪵","l o g"],["map","🗺️","m a p"],["ten","🔟","t e n"],["rat","🐀","r a t"],["bat","🦇","b a t"],
+  ["leg","🦵","l e g"],["box","📦","b o x"],["six","6️⃣","s i x"],["hut","🛖","h u t"]
+].map(([w, e, snd]) => ({w, e, s:snd.split(" ")}));
+const BLEND_MIN = 6;                                                 // words needed before Robot Talk turns on
 const picClip = w => WORDS.some(x => x[0] === w) ? "word_" + w : "pic_" + w.replace(/[^a-z]/g, "");
 let CLIPS = {};
 function buildClips(){
   CLIPS = {};
   PHRASES.forEach(([k, label, hint, t]) => CLIPS[k] = {group:PRAISE_KEYS.includes(k) ? "Praise" : "Phrases", label, hint, tts:t});
   state.profiles.forEach(p => { if (p.slug) CLIPS["child_" + p.slug] = {group:"Names", label:p.name, hint:"Say it the way you usually do.", tts:p.name}; });
-  TEACH_ORDER.forEach(u => { const s = SOUNDS[u]; CLIPS["snd_" + u] = {group:"Letter sounds", label:`${u.toUpperCase()}: just the sound ${s[0]}`, hint:`Only the sound, nothing before it. ${u === "x" ? "As at the end of “fox”." : `As at the start of “${s[1]}”.`}`, tts:s[2], kind:SOUND_TIPS[u][0], tip:SOUND_TIPS[u][1]}; });
+  RECORDED_SOUNDS.forEach(u => { const s = SOUNDS[u]; CLIPS["snd_" + u] = {group:"Letter sounds", label:`${u.toUpperCase()}: just the sound ${s[0]}${ADVANCED.includes(u) ? " (level 8+)" : ""}`, hint:`Only the sound, nothing before it. ${s[1].startsWith("the end of ") ? `As at the end of “${s[1].slice(11)}”.` : `As at the start of “${s[1]}”.`}`, tts:s[2], kind:SOUND_TIPS[u][0], tip:SOUND_TIPS[u][1]}; });
   LETTERS.forEach(l => CLIPS["name_" + l] = {group:"Letter names", label:`${l.toUpperCase()}: just the name “${NAME_TTS[l]}”`, hint:`Only the letter’s name. Not “letter ${l.toUpperCase()}” or “the ${l.toUpperCase()}”: the game adds “Find the…” and “That’s…” itself.`, tts:NAME_TTS[l]});
   WORDS.forEach(([w]) => CLIPS["word_" + w] = {group:"Words", label:`“${w}”`, hint:"Just the word, no “a” or “the”. Used in Spell a word and I Spy.", tts:w});
-  ISPY.forEach(({w, e}) => { const k = picClip(w); if (!CLIPS[k]) CLIPS[k] = {group:"Pictures", label:`${e} “${w}”`, hint:"Just the word, no “a” or “the”.", tts:w}; });
+  [...ISPY, ...BLEND_WORDS].forEach(({w, e}) => { const k = picClip(w); if (!CLIPS[k]) CLIPS[k] = {group:"Pictures", label:`${e} “${w}”`, hint:"Just the word, no “a” or “the”.", tts:w}; });
 }
 buildClips();
 const clipText = k => CLIPS[k] ? CLIPS[k].tts : (k.startsWith("child_") ? "friend" : "");
@@ -800,11 +846,46 @@ function exitFS(){
 /* ================= screens / home ================= */
 function show(id){ document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === id)); }
 let P = state.profiles[0];                       // profile being played
-const disp = (u, upper) => (upper || P.style === "upper") ? u.toUpperCase() : u;
+const disp = (u, upper) => (upper || P.style !== "lower") ? u.toUpperCase() : u;
+/* Letter case by level ("auto"): all capitals at first; from level 6 lowercase mixes in, starting with the
+   letters shaped like their capital; from 8 all letters; from 10 the mirror letters (b d p q, m w, n u h)
+   may share a board. A board never shows two cases of one letter (each letter appears once per board). */
+const LOWER_START = 6, LOWER_ALL = 8, MIRRORS_OK = 10;
+const SAME_SHAPE = ["c","o","s","u","v","w","x","z","k","p","y"];
+const MIRROR_GROUPS = [["b","d","p","q"],["m","w"],["n","u","h"]];
+const caseStyle = (p = P) => p.style === "upper" || p.style === "lower" ? p.style : "auto";
+const lowerShare = () => P.level >= MIRRORS_OK ? .6 : P.level >= LOWER_ALL ? .45 : P.level >= LOWER_START ? .3 : 0;
+function lowerOK(u){
+  const st = caseStyle(); if (st !== "auto") return st === "lower";
+  if (P.level < LOWER_START) return false;
+  return P.level >= LOWER_ALL || (baseOf(u).length === 1 && SAME_SHAPE.includes(baseOf(u)));
+}
+const pickCase = u => { const st = caseStyle(); return st !== "auto" ? st : lowerOK(u) && Math.random() < lowerShare() ? "lower" : "upper"; };
+/* Cases for one board. Big boards can't always keep look-alike letters apart, so the case does it:
+   below level 10 only one letter of each mirror group (b d p q / m w / n u h) may be lowercase,
+   and a capital I never sits next to a lowercase l. */
+function boardCases(units, cas){
+  const c = Object.fromEntries(units.map(u => [u, cas || pickCase(u)]));
+  if (cas) return c;
+  if (!(caseStyle() === "auto" && P.level >= MIRRORS_OK))
+    MIRROR_GROUPS.forEach(g => units.filter(u => g.includes(u) && c[u] === "lower").slice(1).forEach(u => c[u] = "upper"));
+  if (c.i === "upper" && c.l === "lower") c.l = "upper";
+  return c;
+}
+/* words (spelling, robot tiles) are never mixed: capitals early, then lowercase like in books */
+const wordCase = (p = P) => { const st = caseStyle(p); return st !== "auto" ? st : p.level >= LOWER_START ? "lower" : "upper"; };
+const CROWN_SVG = `<svg class="crown" viewBox="0 0 24 14" aria-hidden="true"><path d="M2 12.5 3.6 3l5 4.6L12 1l3.4 6.6L20.4 3 22 12.5z" fill="#F2B233" stroke="#B97F06" stroke-width="1.3" stroke-linejoin="round"/></svg>`;
+/* One way to draw a sound unit: the letter(s), with a crown on a long vowel. style: "upper"/"lower" or the player's. */
+function unitHTML(u, style){
+  const lower = style === "lower" || (!style && P.style === "lower");
+  const b = baseOf(u), t = lower ? b : b.toUpperCase();
+  return isLong(u) ? `<span class="crowned">${CROWN_SVG}${t}</span>` : t;
+}
+const unitLabel = u => isLong(u) ? `${baseOf(u)} that says its name` : u;
 const PLAY_SVG = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>`;
 function nameTiles(p){
   return nameLetters(p.name).split("").map((l, i) =>
-    `<span style="--c:var(${PALETTE[i % PALETTE.length]})">${i ? (p.style === "upper" ? l.toUpperCase() : l.toLowerCase()) : l.toUpperCase()}</span>`).join("");
+    `<span style="--c:var(${PALETTE[i % PALETTE.length]})">${i ? (wordCase(p) === "upper" ? l.toUpperCase() : l.toLowerCase()) : l.toUpperCase()}</span>`).join("");
 }
 function renderHome(){
   $("#profiles").innerHTML = state.profiles.map((p, i) => {
@@ -847,10 +928,17 @@ const G = {session:0, act:null, practice:null, tryLevel:null, done:0, busy:true,
   steps:0, firstSteps:0, prompt:[], recent:[], recentWords:[], lastLine:null, seq:null, idx:0, word:null, unlockRound:false,
   step:0, misses:0, rapid:0, readyAt:0, repeatTimer:null, repeats:0, seenS:{}, unit:null, paired:new Set(), promptOpts:null,
   offered:false, choosing:null, setsPlayed:0, locked:false};
-const confGroup = u => CONFUSE.find(g => g.includes(u)) || [u];
+const confGroup = u => {                                               // mirror letters may meet at high levels
+  const mirrorsOK = caseStyle() === "auto" && P.level >= MIRRORS_OK;
+  return [...new Set([u, ...CONFUSE.filter(g => g.includes(u) && !(mirrorsOK && MIRROR_GROUPS.includes(g))).flat()])];
+};
 const knows = u => P.known.includes(u);
 
 function levelActs(level){ return ACTS.filter(a => a.min <= level && level <= a.max); }
+/* Robot Talk builds words from your recorded sounds, so it only plays once enough words are covered. */
+const blendReady = () => BLEND_WORDS.filter(w => w.s.every(u => hasClip(soundClip(u))));
+const playable = a => a.game !== "robot" || blendReady().length >= BLEND_MIN;
+const playableActs = level => levelActs(level).filter(playable);
 const nameUnlocked = p => !!p.slug && !!p.nameUnlocked;
 function chooseAct(){
   if (G.practice === "NAME") return nameAct(G.tryLevel || P.level);
@@ -858,7 +946,7 @@ function chooseAct(){
   // first round at level 5+ is always the name game, which unlocks its button
   if (P.level >= NAME_UNLOCK && P.slug && !P.nameUnlocked) { G.unlockRound = true; return nameAct(P.level); }
   const byLine = {};
-  levelActs(P.level).forEach(a => (byLine[a.line] = byLine[a.line] || []).push(a));
+  playableActs(P.level).forEach(a => (byLine[a.line] = byLine[a.line] || []).push(a));
   const lines = Object.keys(byLine);
   const weights = lines.map(l => LINES[l].w * (l === G.lastLine && lines.length > 1 ? .35 : 1));   // avoid repeats
   let r = Math.random() * weights.reduce((x, y) => x + y, 0), line = lines[lines.length - 1];
@@ -879,27 +967,30 @@ function reviewBox(key, firstTry){
 }
 const preferDue = (kind, units) => { const d = units.filter(u => isDue(kind, u)); return d.length && Math.random() < .75 ? d : units; };
 const dueFirst = (kind, units) => [...units.filter(u => isDue(kind, u)), ...units.filter(u => !isDue(kind, u))];
-const awakeUnits = p => TEACH_ORDER.filter(u => ((p.boxes || {})["s:" + u] || {}).box >= AWAKE_BOX);
+const awakeUnits = p => ALL_SOUNDS.filter(u => ((p.boxes || {})["s:" + u] || {}).box >= AWAKE_BOX);
 function pickFresh(pool){
   const fresh = pool.filter(u => !G.recent.includes(u));
   const t = rand(preferDue("l:", fresh.length ? fresh : pool));
   G.recent.push(t); while (G.recent.length > Math.min(4, pool.length - 1)) G.recent.shift();
   return t;
 }
-function distractors(avoid, n, pool){
+/* sound: for sound questions, also keep off any card that makes the same (or a very close) sound */
+function distractors(avoid, n, pool, sound = false){
   const bad = new Set(avoid.flatMap(confGroup));
-  const cand = shuffle(pool.filter(u => !bad.has(u)));
+  const clash = u => sound && avoid.some(a => soundClash(a, u));
+  const cand = shuffle(pool.filter(u => !bad.has(u) && !clash(u)));
   const out = [];
-  for (const u of cand) { if (out.length >= n) break; if (!out.some(o => confGroup(o).includes(u))) out.push(u); }
+  for (const u of cand) { if (out.length >= n) break; if (!out.some(o => confGroup(o).includes(u) || (sound && soundClash(o, u)))) out.push(u); }
   for (const u of cand) { if (out.length >= n) break; if (!out.includes(u)) out.push(u); }
-  for (const u of shuffle(pool)) { if (out.length >= n) break; if (!out.includes(u) && !avoid.includes(u)) out.push(u); }
+  for (const u of shuffle(pool)) { if (out.length >= n) break; if (!out.includes(u) && !avoid.includes(u) && !clash(u)) out.push(u); }
   return out;
 }
 /* Sounds asked about: the known ones plus the next few on the list (at least 8 in all).
    Targets rotate evenly: the least-asked sound this session comes up next. */
 function soundPools(n){
-  const known = TEACH_ORDER.filter(knows);
-  const active = known.concat(TEACH_ORDER.filter(u => !knows(u)).slice(0, Math.max(2, 8 - known.length)));
+  const order = P.level >= ADV_LEVEL ? ALL_SOUNDS : TEACH_ORDER;
+  const known = order.filter(knows);
+  const active = known.concat(order.filter(u => !knows(u)).slice(0, Math.max(2, 8 - known.length)));
   const pool = active.length >= n + 2 ? active : TEACH_ORDER.slice(0, Math.max(n + 8, active.length));
   return {active, pool};
 }
@@ -912,16 +1003,16 @@ function pickSound(active){
   G.recent.push(t); while (G.recent.length > Math.min(4, active.length - 1)) G.recent.shift();
   return t;
 }
-const voiceFor = (u, by) => by === "sound" ? "snd_" + u : "name_" + u;
+const voiceFor = (u, by) => by === "sound" ? soundClip(u) : "name_" + u;
 /* "B says /b/" ("S-H says /sh/" for digraphs), put together from the name, "says" and sound clips */
-const pairClips = u => [...u.split("").map(l => "name_" + l), "says", "snd_" + u];
+const pairClips = u => isLong(u) ? ["name_" + baseOf(u), "says_its_name"] : [...u.split("").map(l => "name_" + l), "says", soundClip(u)];
 /* What the voice says after a find: sound games always pair name and sound; letter games pair
    the first time a letter comes up in a session, or when it took more than one try. */
 function findReply(u, by){
   if (by === "sound" || !G.paired.has(u) || G.misses > 0) { G.paired.add(u); return pairClips(u); }
   return ["name_" + u];
 }
-const askFor = (u, by) => by === "sound" ? ["which_says", "snd_" + u] : ["find", "name_" + u];
+const askFor = (u, by) => by === "sound" ? ["which_says", soundClip(u)] : ["find", "name_" + u];
 
 function renderStars(){
   $("#stars").innerHTML = Array.from({length:setSize()}, (_, i) =>
@@ -934,6 +1025,7 @@ const BANNER_ICON = {
   clear:`<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2" opacity=".35"/><rect x="3" y="13" width="8" height="8" rx="2" opacity=".35"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>`,
   word:`<svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="7" width="6" height="10" rx="1.5"/><rect x="9" y="7" width="6" height="10" rx="1.5" opacity=".8"/><rect x="16" y="7" width="6" height="10" rx="1.5" opacity=".6"/></svg>`,
   name:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17l-6.1 3.4 1.5-6.8L2.2 9l6.9-.7z"/></svg>`,
+  robot:`<svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="7" width="14" height="12" rx="3"/><rect x="11" y="3" width="2" height="4"/><circle cx="12" cy="2.6" r="1.6"/><circle cx="9.5" cy="12" r="1.6" fill="#fff"/><circle cx="14.5" cy="12" r="1.6" fill="#fff"/><rect x="9" y="15.5" width="6" height="1.6" rx=".8" fill="#fff"/><rect x="2" y="11" width="2.4" height="5" rx="1.2"/><rect x="19.6" y="11" width="2.4" height="5" rx="1.2"/></svg>`,
   eye:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>`,
   mega:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 4.2v15.6a.8.8 0 0 1-1.2.7L12 17H9.4l1 3.3a1 1 0 0 1-1 1.3H7.6a1 1 0 0 1-.9-.7L5.3 17H4.5A2.5 2.5 0 0 1 2 14.5v-5A2.5 2.5 0 0 1 4.5 7H12l5.8-3.5a.8.8 0 0 1 1.2.7z"/></svg>`
 };
@@ -946,6 +1038,7 @@ function bannerFor(a){
     case "words":  return ["Spell a word", "--green", "word"];
     case "match":  return ["Match the Sound", "--indigo", "mega"];
     case "ispy":   return ["I Spy", "--lime", "eye"];
+    case "robot":  return ["Robot Talk", "--steel", "robot"];
     default:       return ["Spell my name", "--orange", "name"];
   }
 }
@@ -975,19 +1068,26 @@ function layoutSlots(){
 }
 window.addEventListener("resize", () => { layoutCards(); layoutSlots(); });
 
-function renderCards(units, {down = false, upper = false} = {}){
+function renderCards(units, {down = false, cas = null} = {}){
   const cols = shuffle(PALETTE); resetGrid();
+  G.cases = boardCases(units, cas);
   $("#grid").innerHTML = units.map((u, i) =>
-    `<button class="card${down ? " down" : ""}" data-u="${u}" aria-label="${down ? "hidden card" : disp(u, upper)}" style="--c:var(${cols[i % cols.length]})">
-       <span class="inner"><span class="face front${u.length > 1 ? " di" : ""}"><span>${disp(u, upper)}</span></span><span class="face back"></span></span>
+    `<button class="card${down ? " down" : ""}" data-u="${u}" data-case="${G.cases[u]}" aria-label="${down ? "hidden card" : unitLabel(u)}" style="--c:var(${cols[i % cols.length]})">
+       <span class="inner"><span class="face front${baseOf(u).length > 1 ? " di" : ""}"><span>${unitHTML(u, G.cases[u])}</span></span><span class="face back"></span></span>
      </button>`).join("");
   requestAnimationFrame(layoutCards);
 }
 function renderSlots(seq, {pic = null, hint = true, firstUpper = false} = {}){
   $("#target").innerHTML = (pic ? `<div class="pic" id="pic">${pic}</div>` : "") +
-    `<div class="slots">${seq.map((u, i) => `<div class="slot${hint ? "" : " blank"}${i === 0 ? " next" : ""}" data-i="${i}">${disp(u, firstUpper && i === 0)}</div>`).join("")}</div>`;
+    `<div class="slots">${seq.map((u, i) => `<div class="slot${hint ? "" : " blank"}${i === 0 ? " next" : ""}" data-i="${i}">${unitHTML(u, firstUpper && i === 0 ? "upper" : wordCase())}</div>`).join("")}</div>`;
   layoutSlots();
 }
+const ROBOT_SVG = `<svg class="rb" viewBox="0 0 120 110" aria-hidden="true"><rect x="57" y="4" width="6" height="14" rx="3" fill="#4E6E91"/><circle cx="60" cy="6" r="6" fill="#E5483F"/>
+  <rect x="22" y="16" width="76" height="52" rx="16" fill="#8FA9C4"/><rect x="30" y="24" width="60" height="36" rx="10" fill="#E6EEF6"/>
+  <circle cx="47" cy="40" r="7" fill="#1D2B4F"/><circle cx="73" cy="40" r="7" fill="#1D2B4F"/><circle cx="49" cy="38" r="2.2" fill="#fff"/><circle cx="75" cy="38" r="2.2" fill="#fff"/>
+  <rect x="50" y="51" width="20" height="4" rx="2" fill="#1D2B4F"/><rect x="12" y="32" width="10" height="20" rx="5" fill="#4E6E91"/><rect x="98" y="32" width="10" height="20" rx="5" fill="#4E6E91"/>
+  <rect x="28" y="72" width="64" height="36" rx="12" fill="#8FA9C4"/></svg>`;
+const robotLight = j => document.querySelectorAll("#target .lights i").forEach((l, x) => l.classList.toggle("on", x === j));
 function resetGrid(){ const g = $("#grid"); delete g.dataset.cols; delete g.dataset.choice; }
 function renderPics(pics){
   resetGrid();
@@ -1003,7 +1103,7 @@ async function ask(prompt, spoken = prompt){
   G.prompt = prompt; G.hearing = true;
   const step = G.step, sess = G.session;
   await say(spoken, spoken === prompt && G.promptOpts ? G.promptOpts : {});
-  namePic(null);
+  namePic(null); robotLight(-1);
   if (G.step !== step || G.session !== sess) return;
   G.hearing = false; G.readyAt = performance.now(); armRepeat();
 }
@@ -1019,6 +1119,10 @@ function armRepeat(){
 }
 function newStep(){ G.step++; G.misses = 0; G.repeats = 0; G.stepFirst = true; G.unit = null; clearRepeat();
   document.querySelectorAll("#grid .card.hint").forEach(c => c.classList.remove("hint")); }
+$("#target").addEventListener("click", e => {                           // tap the robot to hear it again
+  if (!e.target.closest("#robotBtn")) return;
+  ensureAudio(); if (G.prompt.length && !G.busy && !G.hearing) { G.repeats = 0; ask(G.prompt); }
+});
 $("#speakBtn").addEventListener("click", () => { ensureAudio(); if (G.prompt.length && !G.busy && !G.hearing) { G.repeats = 0; ask(G.prompt); } });
 
 function startSession(profile, practiceId = null, tryLevel = null){
@@ -1035,7 +1139,7 @@ function flipAll(){ SFX.flip(); document.querySelectorAll("#grid .card").forEach
 function choiceActs(){
   if (G.practice || G.done < 1 || G.offered || state.choiceFreq === "never" || (P.level >= NAME_UNLOCK && P.slug && !P.nameUnlocked)) return null;
   const byLine = {};
-  levelActs(P.level).forEach(a => (byLine[a.line] = byLine[a.line] || []).push(a));
+  playableActs(P.level).forEach(a => (byLine[a.line] = byLine[a.line] || []).push(a));
   const lines = shuffle(Object.keys(byLine).filter(l => l !== G.lastLine));
   if (lines.length < 2) return null;
   // "Sometimes": about one set in four; "Often": about half the sets; spread over the rounds of that set
@@ -1074,7 +1178,7 @@ async function nextRound(){
     G.by = "sound";
     const {active, pool} = soundPools(n);
     G.target = pickSound(active);
-    renderCards(shuffle([G.target, ...distractors([G.target], n - 1, pool)]));
+    renderCards(shuffle([G.target, ...distractors([G.target], n - 1, pool, true)]));
     ask(askFor(G.target, "sound"));
   }
   else if (act.game === "memory") {
@@ -1082,7 +1186,7 @@ async function nextRound(){
     let pool = LETTERS;
     if (act.by === "sound") { const sp = soundPools(n); pool = sp.pool; G.target = pickSound(sp.active); }
     else G.target = pickFresh(LETTERS);
-    renderCards(shuffle([G.target, ...distractors([G.target], n - 1, pool)]));
+    renderCards(shuffle([G.target, ...distractors([G.target], n - 1, pool, act.by === "sound")]));
     // "Look closely!" … "Find the B" … (look) … flip, then just "B"
     G.prompt = askFor(G.target, act.by);
     await say(["look", 700, ...G.prompt]); if (!alive()) return;
@@ -1099,7 +1203,7 @@ async function nextRound(){
       const sp = soundPools(n); pool = sp.pool;
       for (const u of [...dueFirst("s:", leastAsked(sp.active)), ...shuffle(pool)]) {
         if (targets.length >= act.finds) break;
-        if (!targets.some(t => confGroup(t).includes(u))) targets.push(u);
+        if (!targets.some(t => confGroup(t).includes(u) || soundClash(t, u))) targets.push(u);
       }
       targets.forEach(markAsked);
     } else {
@@ -1112,7 +1216,7 @@ async function nextRound(){
     targets = shuffle(targets);
     G.seq = targets; G.target = targets[0];
     $("#target").innerHTML = `<div class="pips">${targets.map((_, i) => `<span class="pip${i === 0 ? " next" : ""}"></span>`).join("")}</div>`;
-    renderCards(shuffle([...targets, ...distractors(targets, n - targets.length, pool)]));
+    renderCards(shuffle([...targets, ...distractors(targets, n - targets.length, pool, act.by === "sound")]));
     if (act.down) {
       // the whole board is shown once, with only the first letter asked before the flip
       G.busy = true; G.prompt = askFor(G.target, G.by);
@@ -1130,6 +1234,27 @@ async function nextRound(){
     G.busy = true; await say(["spell", "child_" + P.slug]); if (!alive()) return;
     nextSpellStep();
   }
+  else if (act.game === "robot") {
+    // "Robot says… m-a-p": the robot's chest lights step along; he picks the picture
+    G.by = "sound";
+    let words = blendReady();
+    if (act.stretchy) { const easy = words.filter(w => STRETCHY_FIRST.includes(w.s[0])); if (easy.length >= 2) words = easy; }
+    const fresh = words.filter(w => !G.recentWords.includes(w.w));
+    const word = rand(fresh.length ? fresh : words);
+    G.recentWords.push(word.w); if (G.recentWords.length > 5) G.recentWords.shift();
+    const others = [];
+    for (const o of shuffle(BLEND_WORDS.filter(x => x.w !== word.w))) {
+      if (others.length >= n - 1) break;
+      if (act.stretchy && soundClash(o.s[0], word.s[0])) continue;           // easiest: different first sounds
+      if (!others.some(x => x.w === o.w)) others.push(o);
+    }
+    G.robot = word; G.target = word.w;
+    $("#target").innerHTML = `<button class="robot" id="robotBtn" aria-label="Hear the robot again">${ROBOT_SVG}<span class="lights">${word.s.map(() => "<i></i>").join("")}</span></button>`;
+    renderPics(shuffle([word, ...others]).map(x => ({w:x.w, e:x.e, s:x.s[0]})));
+    const keys = word.s.map(soundClip);
+    G.promptOpts = {gap:act.gap, onStep:(i, key) => robotLight(keys.indexOf(key))};
+    ask(["robot_says", 450, ...keys]);
+  }
   else if (act.game === "ispy") {
     // "I spy something that starts with /m/… moon, cat, sun": each picture is named as it lights up
     G.by = "sound";
@@ -1145,7 +1270,7 @@ async function nextRound(){
     G.target = word.w;
     renderPics(pics);
     G.promptOpts = {gap:260, onStep:(i, key) => namePic(key)};
-    ask(["ispy", "snd_" + G.unit, 500, ...pics.map(x => picClip(x.w))]);
+    ask(["ispy", soundClip(G.unit), 500, ...pics.map(x => picClip(x.w))]);
   }
   else if (act.game === "match") {
     // one letter, a row of megaphones; drag the one whose sound goes with the letter
@@ -1169,15 +1294,16 @@ function nextSpellStep(){
   const act = G.act, u = G.seq[G.idx];
   G.target = u; G.busy = false; newStep();
   G.by = (act.game === "words" && act.by === "sound" && knows(u)) ? "sound" : "name";
-  const upper = act.game === "name" && G.idx === 0;
-  renderCards(shuffle([u, ...distractors([u], act.cards - 1, LETTERS)]), {upper});
+  const cas = act.game === "name" && G.idx === 0 ? "upper" : wordCase();   // names start with a capital
+  renderCards(shuffle([u, ...distractors([u], act.cards - 1, LETTERS)]), {cas});
   markNextSlot();
   ask(askFor(u, G.by));
 }
 
 /* ================= match the sound ================= */
 // sounds easy to mix up by ear never share a board with the target (and are avoided between distractors)
-const SOUND_CONFUSE = [["c","k","q","x"],["b","d","p"],["m","n"],["f","v","th"],["s","z","sh"],["ch","j"],["i","e"],["o","u"]];
+const SOUND_CONFUSE = [["c","k","q","x","ck","qu"],["b","d","p"],["m","n","ng"],["f","v","th"],["s","z","sh"],["ch","j"],["i","e"],["o","u"],
+  ["w","wh"],["e+","ee"],["u+","oo"]];
 const soundClash = (a, b) => a === b || SOUND_CONFUSE.some(g => g.includes(a) && g.includes(b));
 function soundDistractors(t, n, pool){
   const cand = shuffle(pool.filter(u => !soundClash(u, t))), out = [];
@@ -1193,7 +1319,7 @@ const BADGE_SVG = `<span class="mbadge"><svg class="tp" viewBox="0 0 24 24" fill
 const megaVars = el => ["--m1","--m2","--m3"].map(v => `${v}:${el.style.getPropertyValue(v)}`).join(";");
 function renderMatch(t, units){
   const pal = shuffle(MEGA_PAL), grid = $("#grid");
-  $("#target").innerHTML = `<div class="mdrop" id="mdrop"><div class="mletter${t.length > 1 ? " di" : ""}" style="--c:var(${rand(PALETTE)})"><span>${disp(t)}</span></div></div>`;
+  $("#target").innerHTML = `<div class="mdrop" id="mdrop"><div class="mletter${baseOf(t).length > 1 ? " di" : ""}" style="--c:var(${rand(PALETTE)})"><span>${unitHTML(t, pickCase(t))}</span></div></div>`;
   resetGrid(); grid.dataset.cols = units.length;
   grid.innerHTML = units.map((u, i) => { const [a, b, c] = pal[i % pal.length];
     return `<button class="card mega" data-u="${u}" aria-label="Play a sound" style="--m1:${a};--m2:${b};--m3:${c}"><span class="mface">${MEGA_SVG}${WAVES_SVG}${BADGE_SVG}</span></button>`; }).join("");
@@ -1211,7 +1337,7 @@ async function playMega(el){
   const step = G.step, sess = G.session;
   document.querySelectorAll("#grid .mega.playing").forEach(m => m.classList.remove("playing"));
   el.classList.add("playing", "heard"); el.setAttribute("aria-label", "Sound, heard");
-  await say(["snd_" + el.dataset.u]);
+  await say([soundClip(el.dataset.u)]);
   el.classList.remove("playing");
   if (G.step === step && G.session === sess && !G.busy && !G.hearing) { G.readyAt = performance.now(); armRepeat(); }
 }
@@ -1301,26 +1427,29 @@ async function wrong(card, u){
   SFX.wrong();
   // "That's M…" with the cards locked for at least a second, then "Find the B" again
   if (G.act.game === "ispy") {                 // "Cat starts with /k/."
-    await say([250, picClip(u), "starts_with", "snd_" + card.dataset.s]);
+    await say([250, picClip(u), "starts_with", soundClip(card.dataset.s)]);
   }
-  else await say([250, ...(G.by === "sound" ? ["that_says", "snd_" + u] : ["thats", "name_" + u])]);
+  else if (G.act.game === "robot") await wait(250);                      // the robot just says it again
+  else await say([250, ...(G.by === "sound" ? ["that_says", soundClip(u)] : ["thats", "name_" + u])]);
   const left = 1000 - (performance.now() - t0); if (left > 0) await wait(left);
   if (G.session !== sess || G.step !== step) return;
   helpAfterMiss(card);
   G.busy = false; G.readyAt = performance.now();
-  const again = await say([150, ...G.prompt], G.promptOpts || {}); namePic(null);
+  const again = await say([150, ...G.prompt], G.promptOpts || {}); namePic(null); robotLight(-1);
   if (again && G.session === sess && G.step === step) armRepeat();
 }
 function logStep(){
   G.steps++; if (G.stepFirst) G.firstSteps++;
   if (G.practice) return;
-  const u = G.unit || G.target, k = (G.by === "sound" ? "s:" : "l:") + u;
+  const robot = G.act && G.act.game === "robot";                       // blending progress is kept per word
+  const u = G.unit || G.target, lower = G.by === "name" && (G.cases || {})[u] === "lower";
+  const k = robot ? "w:" + u : G.by === "sound" ? "s:" + u : (lower ? "ll:" : "l:") + u;
   reviewBox(k, G.stepFirst);
   const s = P.stats[k] || {n:0, f:0, r:[]};
   s.n++; if (G.stepFirst) s.f++; s.r.push(G.stepFirst ? 1 : 0); if (s.r.length > 6) s.r.shift();
   P.stats[k] = s;
   // a sound counts as known once found first-try 5 of the last 6 times
-  if (G.by === "sound" && !knows(u) && s.r.length >= 5 && s.r.reduce((a, b) => a + b, 0) >= 5) P.known.push(u);
+  if (!robot && G.by === "sound" && !knows(u) && s.r.length >= 5 && s.r.reduce((a, b) => a + b, 0) >= 5) P.known.push(u);
   save();
 }
 /* Spoken praise now and then (about 1 in 3), never the same clip twice running.
@@ -1388,9 +1517,20 @@ async function correct(card){
 
   card.classList.add("win");
   document.querySelectorAll("#grid .card").forEach(c => { if (c !== card) c.classList.add("dim"); });
+  if (act.game === "robot") {                  // letter tiles light up as the robot blends again, then the word
+    const keys = G.robot.s.map(soundClip);
+    card.querySelector(".front").insertAdjacentHTML("beforeend", `<span class="rtiles">${G.robot.s.map(u => `<span>${unitHTML(u, wordCase())}</span>`).join("")}</span>`);
+    const tiles = [...card.querySelectorAll(".rtiles span")];
+    await say([250, ...keys], {gap:140, onStep:(i, key) => { const j = keys.indexOf(key); tiles.forEach((t, x) => t.classList.toggle("on", x <= j)); robotLight(j); }});
+    if (!alive()) return;
+    robotLight(-1);
+    await say([200, picClip(G.target), 150, ...praise(first)]);
+    if (!alive()) return;
+    return endRound(alive);
+  }
   if (act.game === "ispy") {                   // "Moon starts with /m/. M says /m/."
-    card.querySelector(".front").insertAdjacentHTML("beforeend", `<span class="plet">${disp(G.unit)}</span>`);
-    await say([200, picClip(G.target), "starts_with", "snd_" + G.unit, 300, ...pairClips(G.unit), 120, ...praise(first)]);
+    card.querySelector(".front").insertAdjacentHTML("beforeend", `<span class="plet">${unitHTML(G.unit, pickCase(G.unit))}</span>`);
+    await say([200, picClip(G.target), "starts_with", soundClip(G.unit), 300, ...pairClips(G.unit), 120, ...praise(first)]);
     if (!alive()) return;
     return endRound(alive);
   }
@@ -1405,7 +1545,7 @@ async function finishSeq(alive){
   $("#grid").innerHTML = "";
   await wait(300); if (!alive()) return;
   if (act.game === "words") {
-    const snd = G.seq.map(u => "snd_" + u);
+    const snd = G.seq.map(soundClip);
     await say(snd, {onStep:hl, gap:420}); if (!alive()) return;       // slow…
     await wait(200);
     await say(snd, {onStep:hl, gap:60}); if (!alive()) return;        // …faster…
@@ -1453,7 +1593,7 @@ function party(kind){
     SFX.levelup(); setTimeout(() => say(pickPraise(["level_up"])), 700);
   } else if (kind === "unlock") {
     const letters = nameLetters(P.name).split("");
-    $("#partyArt").innerHTML = `<div class="nametiles big" aria-label="${esc(P.name)}">${letters.map((l, i) => `<span style="--c:var(${PALETTE[i % PALETTE.length]})">${i ? disp(l.toLowerCase()) : l.toUpperCase()}</span>`).join("")}</div>`;
+    $("#partyArt").innerHTML = `<div class="nametiles big" aria-label="${esc(P.name)}">${letters.map((l, i) => `<span style="--c:var(${PALETTE[i % PALETTE.length]})">${i ? (wordCase() === "upper" ? l.toUpperCase() : l.toLowerCase()) : l.toUpperCase()}</span>`).join("")}</div>`;
     SFX.levelup(); setTimeout(() => say([...pickPraise(["you_did_it"]), 200, "child_" + P.slug]), 700);
   } else {
     // letters whose sound reached the collection's "awake" box since the last celebration
@@ -1500,12 +1640,13 @@ const ALBUM_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 const FACE_AWAKE = `<svg viewBox="0 0 40 20" aria-hidden="true"><circle cx="11" cy="6" r="3.2" fill="currentColor"/><circle cx="29" cy="6" r="3.2" fill="currentColor"/><path d="M13 13q7 6 14 0" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>`;
 const FACE_ASLEEP = `<svg viewBox="0 0 40 20" aria-hidden="true"><path d="M7 6q4 4 8 0M25 6q4 4 8 0" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M16 15h8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>`;
 function albumTile(u, awake, i){
-  return `<button class="atile ${awake ? "awake" : "asleep"}" data-u="${u}" style="--c:var(${PALETTE[i % PALETTE.length]})" aria-label="${awake ? u + ", awake" : "sleeping letter"}">
-    <b>${disp(u)}</b>${awake ? FACE_AWAKE : FACE_ASLEEP + '<span class="zz">z</span>'}</button>`;
+  return `<button class="atile ${awake ? "awake" : "asleep"}" data-u="${u}" style="--c:var(${PALETTE[i % PALETTE.length]})" aria-label="${awake ? unitLabel(u) + ", awake" : "sleeping letter"}">
+    <b>${unitHTML(u)}</b>${awake ? FACE_AWAKE : FACE_ASLEEP + '<span class="zz">z</span>'}</button>`;
 }
 function openAlbum(p){
   P = p; const awake = new Set(awakeUnits(p));
-  $("#albGrid").innerHTML = TEACH_ORDER.map((u, i) => albumTile(u, awake.has(u), i)).join("");
+  $("#albGrid").innerHTML = TEACH_ORDER.map((u, i) => albumTile(u, awake.has(u), i)).join("") +
+    (p.level >= ADV_LEVEL ? `<h3 class="albh">${CROWN_SVG.replace('class="crown"', "")}More sounds</h3>` + ADVANCED.map((u, i) => albumTile(u, awake.has(u), i + 2)).join("") : "");
   show("album");
 }
 $("#albGrid").addEventListener("click", e => {
@@ -1616,7 +1757,7 @@ $("#fileMany").addEventListener("change", async e => {
   let msg = `Imported ${ok} clip${ok === 1 ? "" : "s"}.`;
   if (unknown.length) msg += ` Names not recognized: ${unknown.slice(0, 6).join(", ")}${unknown.length > 6 ? "…" : ""}.`;
   if (failed.length) msg += ` Couldn’t read: ${failed.slice(0, 4).join(", ")}.`;
-  status(msg); renderRecCounts();
+  renderParent(); status(msg);                  // redraw so newly unlocked games (Robot Talk) show up
 });
 let importOneKey = null;
 $("#fileOne").addEventListener("change", async e => {
@@ -1636,13 +1777,13 @@ async function backup(){
   const clips = {}; for (const [k, b] of clipBlobs) clips[k] = await blobToB64(b);
   const profiles = state.profiles.map(({slug, ...p}) => p);
   if (!downloads) {
-    const data = JSON.stringify({app:"letter-hunt", version:3, profiles, clips});
+    const data = JSON.stringify({app:"letter-hunt", version:4, profiles, clips});
     const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], {type:"application/json"}));
     a.download = "letter-hunt-backup.json"; document.body.appendChild(a); a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
     status("Backup saved to your downloads."); return;
   }
-  try { await downloads.save({filename:"letter-hunt-backup.json", data:JSON.stringify({app:"letter-hunt", version:3, profiles, clips})}); status("Backup saved."); }
+  try { await downloads.save({filename:"letter-hunt-backup.json", data:JSON.stringify({app:"letter-hunt", version:4, profiles, clips})}); status("Backup saved."); }
   catch(e) { if (!e || e.code !== "declined") status("The backup couldn’t be saved here."); }
 }
 $("#fileBackup").addEventListener("change", async e => {
@@ -1652,6 +1793,7 @@ $("#fileBackup").addEventListener("change", async e => {
     if (Array.isArray(j.profiles) && j.profiles.length) {
       state.profiles = j.profiles.map(p => Object.assign(newProfile(), p, {stats:fixStats(p.stats), slug:slug(p.name)}));
       if ((j.version || 2) < 3) state.profiles.forEach(migrateLevel);   // backup from before the 12-level table
+      if ((j.version || 2) < 4) state.profiles.forEach(p => { if (p.style !== "lower") p.style = "auto"; });   // before automatic letter case
       state.editId = state.profiles[0].id; save(); buildClips();
     }
     let n = 0;
@@ -1699,17 +1841,18 @@ function renderRecCounts(){
   if (el) el.textContent = `${keys.filter(hasClip).length} of ${keys.length} recorded`;
   const b = $("#backupBtn"); if (b) b.hidden = !canBackup();
 }
-function progressTiles(E, prefix, units){
+function progressTiles(E, prefix, units, cas){
   return `<div class="prog">${units.map(u => { const s = E.stats[prefix + u];
     let cls = ""; if (s && s.n >= 2) { const r = s.f / s.n; cls = r >= .8 ? "g" : r >= .5 ? "y" : "r"; }
-    const t = E.style === "upper" ? u.toUpperCase() : u;
+    const t = unitHTML(u, cas || (caseStyle(E) === "lower" ? "lower" : "upper"));
     const b = (E.boxes || {})[prefix + u];
     return `<div class="pt ${cls}" title="${s ? `${s.f} of ${s.n} on the first try` : "not played yet"}${b ? ` · review box ${b.box}` : ""}">${t}${s ? `<small>${s.f}/${s.n}</small>` : ""}${b ? `<i class="bx">${b.box}</i>` : ""}</div>`; }).join("")}</div>`;
 }
 function levelMap(E){
   return Array.from({length:MAX_LEVEL}, (_, i) => {
     const lv = i + 1;
-    let chips = levelActs(lv).map(a => `<button type="button" class="achip" data-try="${a.id}">${actLabel(a)}</button>`).join("");
+    let chips = levelActs(lv).map(a => playable(a) ? `<button type="button" class="achip" data-try="${a.id}">${actLabel(a)}</button>`
+      : `<button type="button" class="achip" disabled title="Record more letter sounds to turn it on (see Your voice)">Robot Talk: needs recordings</button>`).join("");
     if (lv >= NAME_UNLOCK) chips += `<button type="button" class="achip special" data-try="NAME" data-lv="${lv}" ${E.slug ? "" : "disabled title='Add a name first'"}>${actLabel(nameAct(lv))}</button>`;
     return `<div class="lvrow${lv === E.level ? " cur" : ""}"><span class="ln">Level ${lv}</span><div class="achips">${chips}</div></div>`;
   }).join("");
@@ -1725,7 +1868,7 @@ function renderParent(){
     <h2>Players</h2>
     <div class="ptabs">${seg("editId", state.profiles.map(p => [p.id, esc(p.name || "Unnamed")]), E.id)}<button class="btn" id="addProf">Add player</button></div>
     <div class="row" style="margin-top:8px"><label for="nameIn">Name</label><input type="text" id="nameIn" value="${esc(E.name)}" autocomplete="off" spellcheck="false" placeholder="e.g. Leo"></div>
-    <div class="row"><span>Letter style</span>${seg("style", [["upper","ABC"],["lower","abc"]], E.style)}</div>
+    <div class="row"><span>Letter case<span class="small" style="display:block">Automatic: capitals first; lowercase mixes in from level ${LOWER_START} (letters shaped like their capital first), all letters from ${LOWER_ALL}. Spelling uses lowercase from level ${LOWER_START}.</span></span>${seg("style", [["auto","Automatic"],["upper","ABC"],["lower","abc"]], caseStyle(E))}</div>
     <div class="row"><span>Level</span>${stepper("level", E.level, 1, MAX_LEVEL)}</div>
     <div style="padding:4px 0 6px">
       ${E.level >= MAX_LEVEL ? `<p class="small">Top level.</p>` : `
@@ -1746,14 +1889,18 @@ function renderParent(){
   <div class="sec">
     <h2>Sounds ${esc(who)} knows</h2>
     <p class="note">Sound games mostly ask about these and mix in the next two on the list. A sound is marked known automatically after it’s found on the first try 5 of the last 6 times. Tap to change any of them.</p>
-    <div class="chips">${TEACH_ORDER.map(u => `<button type="button" class="chip" data-u="${u}" aria-pressed="${E.known.includes(u)}">${E.style === "upper" ? u.toUpperCase() : u}</button>`).join("")}</div>
+    <div class="chips">${TEACH_ORDER.map(u => `<button type="button" class="chip" data-u="${u}" aria-pressed="${E.known.includes(u)}">${unitHTML(u, caseStyle(E) === "lower" ? "lower" : "upper")}</button>`).join("")}</div>
+    <h3 style="font:600 15px system-ui;margin:14px 0 6px;color:var(--muted)">More sounds (level ${ADV_LEVEL}+): a crown means the letter says its name</h3>
+    <div class="chips">${ADVANCED.map(u => `<button type="button" class="chip" data-u="${u}" aria-pressed="${E.known.includes(u)}">${unitHTML(u, caseStyle(E) === "lower" ? "lower" : "upper")}</button>`).join("")}</div>
   </div>
 
   <div class="sec">
     <h2>How ${esc(who)} is doing</h2>
     <p class="note">First-try finds out of total finds. Green is 80% or more, yellow 50–79%, red below 50%. The small number is the review box (0–5): a letter found first try on its review day moves up a box and comes back later (next day, 2, 4, 10, then 21 days); a miss sends it back to box 1. A sound “wakes up” in ${esc(who)}’s letter collection at box ${AWAKE_BOX}.</p>
-    <h3 style="font:600 15px system-ui;margin:10px 0 6px;color:var(--muted)">Letters</h3>${progressTiles(E, "l:", LETTERS)}
+    <h3 style="font:600 15px system-ui;margin:10px 0 6px;color:var(--muted)">Letters</h3>${progressTiles(E, "l:", LETTERS, "upper")}
+    <h3 style="font:600 15px system-ui;margin:16px 0 6px;color:var(--muted)">Lowercase letters (from level ${LOWER_START})</h3>${progressTiles(E, "ll:", LETTERS, "lower")}
     <h3 style="font:600 15px system-ui;margin:16px 0 6px;color:var(--muted)">Sounds</h3>${progressTiles(E, "s:", TEACH_ORDER)}
+    <h3 style="font:600 15px system-ui;margin:16px 0 6px;color:var(--muted)">More sounds (level ${ADV_LEVEL}+)</h3>${progressTiles(E, "s:", ADVANCED)}
     <div style="margin-top:14px"><button class="btn danger" id="resetStats">Clear progress and go back to level 1</button></div>
   </div>
 
@@ -1788,6 +1935,8 @@ function renderParent(){
         <li><b>Vowels</b> use their short sound: a as in apple, e as in egg, i as in itch, o as in octopus, u as in up.</li>
         <li>Somewhere quiet, about a hand’s width from the tablet. Step-by-step mode counts you in, records, and plays it back. The picture of the sound helps: a quick sound should look like a short blip; a long tail usually means an extra “uh”.</li>
         <li><b>Say only the part on the label.</b> The game joins clips together: “Find the…” + “B”, “Which letter says…” + “b”, “B” + “says” + “b”, “Moon” + “starts with” + “mmm”. So a letter name is just “bee” (not “letter B”), a sound is just “b”, and a word is just “moon” (no “a” or “the”).</li>
+        <li><b>More sounds (level ${ADV_LEVEL}+)</b> reuse what you already have: long vowels (a crown on the letter) and “ee” use your letter-name clips, and ck, qu and wh use the k, q and w sounds. Only “ng” and “oo” are new.</li>
+        <li><b>Robot Talk</b> (level 4+) builds words from your letter sounds, so it turns on once ${BLEND_MIN} of its ${BLEND_WORDS.length} words are covered. ${robotNeedText()}</li>
         <li>Cheers: record any you like. If you record some, only recorded ones are played; ones you skip stay quiet instead of using the robot.</li>
       </ul>
       <button class="btn primary" data-guide="Letter sounds">Record sounds step by step</button>
@@ -1864,10 +2013,18 @@ $("#pBody").addEventListener("click", async e => {
   else if (id === "restoreBtn") $("#fileBackup").click();
 });
 
+/* Which recorded sounds would unlock the most Robot Talk words next */
+function robotNeedText(){
+  const ready = blendReady().length, need = {};
+  BLEND_WORDS.forEach(w => { const miss = [...new Set(w.s.filter(u => !hasClip(soundClip(u))))]; miss.forEach(u => need[u] = (need[u] || 0) + 1 / miss.length); });
+  const top = Object.keys(need).sort((a, b) => need[b] - need[a]).slice(0, 6);
+  return `Now ${ready} of ${BLEND_WORDS.length} ready${ready >= BLEND_MIN ? " (it’s on)" : ""}.${top.length ? ` Most useful to record next: ${top.map(u => SOUNDS[u][0]).join(", ")}.` : ""}`;
+}
+
 /* ================= step-by-step recording ================= */
 let guide = null;   // {group, keys, i}
 function guideKeys(group){
-  let ks = group === "Letter sounds" ? TEACH_ORDER.map(u => "snd_" + u) : Object.keys(CLIPS).filter(k => CLIPS[k].group === group);
+  let ks = group === "Letter sounds" ? RECORDED_SOUNDS.map(u => "snd_" + u) : Object.keys(CLIPS).filter(k => CLIPS[k].group === group);
   if (recFilter === "missing") { const miss = ks.filter(k => !hasClip(k)); if (miss.length) ks = miss; }
   return ks;
 }
